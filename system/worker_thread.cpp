@@ -7,7 +7,6 @@
 #include "query.h"
 #include "ycsb_query.h"
 #include "math.h"
-#include "helper.h"
 #include "msg_thread.h"
 #include "msg_queue.h"
 #include "work_queue.h"

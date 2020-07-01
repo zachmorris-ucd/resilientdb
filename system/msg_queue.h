@@ -2,7 +2,6 @@
 #define _MSG_QUEUE_H_
 
 #include "global.h"
-#include "helper.h"
 #include "lock_free_queue.h"
 #include <boost/lockfree/queue.hpp>
 

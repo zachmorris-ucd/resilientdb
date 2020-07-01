@@ -1,5 +1,4 @@
 #include "global.h"
-#include "helper.h"
 #include "thread.h"
 #include "io_thread.h"
 #include "query.h"

@@ -4,7 +4,6 @@
 #include "wl.h"
 #include "query.h"
 #include "math.h"
-#include "helper.h"
 #include "msg_queue.h"
 #include "message.h"
 

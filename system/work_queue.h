@@ -2,7 +2,6 @@
 #define _WORK_QUEUE_H_
 
 #include "global.h"
-#include "helper.h"
 #include <queue>
 #include <boost/lockfree/queue.hpp>
 

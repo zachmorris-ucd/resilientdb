@@ -2,7 +2,6 @@
 #define _MSG_THREAD_H_
 
 #include "global.h"
-#include "helper.h"
 #include "nn.hpp"
 
 struct mbuf

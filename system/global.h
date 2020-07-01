@@ -23,6 +23,7 @@
 #include <sys/time.h>
 #include <math.h>
 
+#include "./helper.h"
 #include "pthread.h"
 #include "config.h"
 #include "stats.h"

@@ -2,7 +2,6 @@
 #define _MESSAGE_H_
 
 #include "global.h"
-#include "helper.h"
 #include "array.h"
 #include <mutex>
 

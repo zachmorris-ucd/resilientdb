@@ -2,7 +2,6 @@
 #define _TXN_H_
 
 #include "global.h"
-#include "helper.h"
 #include "semaphore.h"
 #include "array.h"
 #include "message.h"
