@@ -134,7 +134,6 @@ public:
     BatchRequests *batchreq;
     void set_primarybatch(BatchRequests *breq);
 
-    vector<string> allsign;
 
     uint64_t get_abort_cnt() { return abort_cnt; }
     uint64_t abort_cnt;

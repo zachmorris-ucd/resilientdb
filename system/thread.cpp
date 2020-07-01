@@ -19,10 +19,9 @@ void Thread::send_init_done_to_all_nodes()
         {
             printf("Send INIT_DONE to %ld\n", i);
 
-            vector<string> emptyvec;
             vector<uint64_t> dest;
             dest.push_back(i);
-            msg_queue.enqueue(get_thd_id(), Message::create_message(INIT_DONE), emptyvec, dest);
+            msg_queue.enqueue(get_thd_id(), Message::create_message(INIT_DONE), dest);
             dest.clear();
         }
     }

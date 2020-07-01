@@ -1368,7 +1368,7 @@ void BatchRequests::copy_from_txn(TxnManager *txn, BankingSmartContractMessage *
 	uint64_t idx = txnid % get_batch_size();
 
 	// TODO: Some memory is getting consumed while storing client query.
-	char *bfr = (char *)malloc(clqry->get_size() + 1);
+	char *bfr = (char *)malloc(clqry->get_size());
 	clqry->copy_to_buf(bfr);
 	Message *tmsg = Message::create_message(bfr);
 	BankingSmartContractMessage *yqry = (BankingSmartContractMessage *)tmsg;
@@ -1385,7 +1385,7 @@ void BatchRequests::copy_from_txn(TxnManager *txn, YCSBClientQueryMessage *clqry
 	uint64_t idx = txnid % get_batch_size();
 
 	// TODO: Some memory is getting consumed while storing client query.
-	char *bfr = (char *)malloc(clqry->get_size() + 1);
+	char *bfr = (char *)malloc(clqry->get_size());
 	clqry->copy_to_buf(bfr);
 	Message *tmsg = Message::create_message(bfr);
 	YCSBClientQueryMessage *yqry = (YCSBClientQueryMessage *)tmsg;
@@ -1786,7 +1786,7 @@ uint64_t Message::buf_to_string(char *buf, uint64_t ptr, string &str, uint64_t s
 // Message Creation methods.
 char *create_msg_buffer(Message *msg)
 {
-	char *buf = (char *)malloc(msg->get_size() + 1);
+	char *buf = (char *)malloc(msg->get_size());
 	return buf;
 }
 

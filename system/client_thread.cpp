@@ -37,11 +37,10 @@ void ClientThread::send_key()
 		keyex->pkeySz = keyex->pkey.size();
 		keyex->return_node = g_node_id;
 
-		vector<string> emptyvec;
 		vector<uint64_t> dest;
 		dest.push_back(i);
 
-		msg_queue.enqueue(get_thd_id(), keyex, emptyvec, dest);
+		msg_queue.enqueue(get_thd_id(), keyex, dest);
 #endif
 
 #if CRYPTO_METHOD_CMAC_AES
@@ -53,7 +52,7 @@ void ClientThread::send_key()
 		keyexCMAC->pkeySz = keyexCMAC->pkey.size();
 		keyexCMAC->return_node = g_node_id;
 		//msg_queue.enqueue(get_thd_id(), keyexCMAC, i);
-		msg_queue.enqueue(get_thd_id(), keyexCMAC, emptyvec, dest);
+		msg_queue.enqueue(get_thd_id(), keyexCMAC, dest);
 		dest.clear();
 #endif
 	}
@@ -224,12 +223,10 @@ RC ClientThread::run()
 			delete_msg_buffer(buf);
 #endif // TIMER_ON
 
-			vector<string> emptyvec;
-			emptyvec.push_back(bmsg->signature);
 
 			vector<uint64_t> dest;
 			dest.push_back(next_node_id);
-			msg_queue.enqueue(get_thd_id(), bmsg, emptyvec, dest);
+			msg_queue.enqueue(get_thd_id(), bmsg, dest);
 			dest.clear();
 
 			num_txns_sent += g_batch_size;
@@ -257,8 +254,6 @@ void ClientThread::resend_msg(ClientQueryBatch *symsg)
 	//cout << "Resend: " << symsg->cqrySet[get_batch_size()-1]->client_startts << "\n";
 	//fflush(stdout);
 
-	vector<string> emptyvec;
-	emptyvec.push_back(symsg->signature); // Sign the message.
 
 	char *buf = create_msg_buffer(symsg);
 	for (uint64_t j = 0; j < g_node_cnt; j++)
@@ -267,10 +262,9 @@ void ClientThread::resend_msg(ClientQueryBatch *symsg)
 		dest.push_back(j);
 
 		Message *deepCMsg = deep_copy_msg(buf, symsg);
-		msg_queue.enqueue(get_thd_id(), deepCMsg, emptyvec, dest);
+		msg_queue.enqueue(get_thd_id(), deepCMsg, dest);
 		dest.clear();
 	}
-	emptyvec.clear();
 	delete_msg_buffer(buf);
 	Message::release_message(symsg);
 }

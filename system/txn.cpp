@@ -447,7 +447,6 @@ void TxnManager::send_pbft_prep_msgs()
     }
 #endif
 
-    vector<string> emptyvec;
     vector<uint64_t> dest;
     for (uint64_t i = 0; i < g_node_cnt; i++)
     {
@@ -458,7 +457,7 @@ void TxnManager::send_pbft_prep_msgs()
         dest.push_back(i);
     }
 
-    msg_queue.enqueue(get_thd_id(), pmsg, emptyvec, dest);
+    msg_queue.enqueue(get_thd_id(), pmsg, dest);
     dest.clear();
 }
 
@@ -478,7 +477,6 @@ void TxnManager::send_pbft_commit_msgs()
     }
 #endif
 
-    vector<string> emptyvec;
     vector<uint64_t> dest;
     for (uint64_t i = 0; i < g_node_cnt; i++)
     {
@@ -489,7 +487,7 @@ void TxnManager::send_pbft_commit_msgs()
         dest.push_back(i);
     }
 
-    msg_queue.enqueue(get_thd_id(), cmsg, emptyvec, dest);
+    msg_queue.enqueue(get_thd_id(), cmsg, dest);
     dest.clear();
 }
 
@@ -497,11 +495,7 @@ void TxnManager::send_pbft_commit_msgs()
 
 void TxnManager::release_all_messages(uint64_t txn_id)
 {
-    if ((txn_id + 3) % get_batch_size() == 0)
-    {
-        allsign.clear();
-    }
-    else if ((txn_id + 1) % get_batch_size() == 0)
+    if ((txn_id + 1) % get_batch_size() == 0)
     {
         info_prepare.clear();
         info_commit.clear();
@@ -528,7 +522,6 @@ void TxnManager::send_checkpoint_msgs()
     Message *msg = Message::create_message(this, PBFT_CHKPT_MSG);
     CheckpointMessage *ckmsg = (CheckpointMessage *)msg;
 
-    vector<string> emptyvec;
     vector<uint64_t> dest;
     for (uint64_t i = 0; i < g_node_cnt; i++)
     {
@@ -539,6 +532,6 @@ void TxnManager::send_checkpoint_msgs()
         dest.push_back(i);
     }
 
-    msg_queue.enqueue(get_thd_id(), ckmsg, emptyvec, dest);
+    msg_queue.enqueue(get_thd_id(), ckmsg, dest);
     dest.clear();
 }

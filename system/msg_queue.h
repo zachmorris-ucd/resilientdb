@@ -23,7 +23,7 @@ class MessageQueue
 public:
     void init();
 
-    void enqueue(uint64_t thd_id, Message *msg, const vector<string> &ndsign, const vector<uint64_t> &dest);
+    void enqueue(uint64_t thd_id, Message *msg, const vector<uint64_t> &dest);
     vector<uint64_t> dequeue(uint64_t thd_id, vector<string> &allsign, Message *&msg);
 
 private:

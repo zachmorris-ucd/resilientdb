@@ -40,10 +40,10 @@ void WorkerThread::send_key()
         keyex->return_node = g_node_id;
         //msg_queue.enqueue(get_thd_id(), keyex, i);
 
-        vector<string> emptyvec;
         vector<uint64_t> dest;
         dest.push_back(i);
-        msg_queue.enqueue(get_thd_id(), keyex, emptyvec, dest);
+        msg_queue.enqueue(get_thd_id(), keyex, dest);
+        dest.clear();
 
 #endif
 
@@ -55,7 +55,7 @@ void WorkerThread::send_key()
         keyexCMAC->return_node = g_node_id;
         //msg_queue.enqueue(get_thd_id(), keyexCMAC, i);
 
-        msg_queue.enqueue(get_thd_id(), keyexCMAC, emptyvec, dest);
+        msg_queue.enqueue(get_thd_id(), keyexCMAC, dest);
         dest.clear();
 
         cout << "Sending CMAC " << cmacPrivateKeys[i] << endl;
@@ -184,10 +184,9 @@ RC WorkerThread::process_key_exchange(Message *msg)
             Message *rdy = Message::create_message(READY);
             //msg_queue.enqueue(get_thd_id(), rdy, i);
 
-            vector<string> emptyvec;
             vector<uint64_t> dest;
             dest.push_back(i);
-            msg_queue.enqueue(get_thd_id(), rdy, emptyvec, dest);
+            msg_queue.enqueue(get_thd_id(), rdy, dest);
             dest.clear();
         }
 
@@ -292,7 +291,6 @@ void WorkerThread::check_for_timeout()
         fflush(stdout);
 
         //send view change messages
-        vector<string> emptyvec;
         vector<uint64_t> dest;
         for (uint64_t i = 0; i < g_node_cnt; i++)
         {
@@ -311,7 +309,7 @@ void WorkerThread::check_for_timeout()
         char *buf = create_msg_buffer(msg);
         Message *deepCMsg = deep_copy_msg(buf, msg);
         // Send to other replicas.
-        msg_queue.enqueue(get_thd_id(), deepCMsg, emptyvec, dest);
+        msg_queue.enqueue(get_thd_id(), deepCMsg, dest);
         dest.clear();
 
         // process a message for itself
@@ -395,14 +393,13 @@ void WorkerThread::client_query_check(ClientQueryBatch *clbtch)
     add_timer(clbtch, calculateHash(qry->getString()));
 
     // Forward to the primary.
-    vector<string> emptyvec;
-    emptyvec.push_back(clbtch->signature); // Sign the message.
     vector<uint64_t> dest;
     dest.push_back(get_current_view(get_thd_id()));
 
     char *tbuf = create_msg_buffer(clbtch);
     Message *deepCMsg = deep_copy_msg(tbuf, clbtch);
-    msg_queue.enqueue(get_thd_id(), deepCMsg, emptyvec, dest);
+    msg_queue.enqueue(get_thd_id(), deepCMsg, dest);
+    dest.clear();
     delete_msg_buffer(tbuf);
 }
 
@@ -491,7 +488,6 @@ RC WorkerThread::process_view_change_msg(Message *msg)
         }
 
         //send new view messages
-        vector<string> emptyvec;
         vector<uint64_t> dest;
         for (uint64_t i = 0; i < g_node_cnt; i++)
         {
@@ -504,7 +500,7 @@ RC WorkerThread::process_view_change_msg(Message *msg)
 
         char *buf = create_msg_buffer(nvmsg);
         Message *deepCMsg = deep_copy_msg(buf, nvmsg);
-        msg_queue.enqueue(get_thd_id(), deepCMsg, emptyvec, dest);
+        msg_queue.enqueue(get_thd_id(), deepCMsg, dest);
         dest.clear();
 
         delete_msg_buffer(buf);
@@ -854,8 +850,8 @@ void WorkerThread::send_execute_msg()
  */
 RC WorkerThread::process_execute_msg(Message *msg)
 {
-    //cout << "EXECUTE " << msg->txn_id << " :: " << get_thd_id() <<"\n";
-    //fflush(stdout);
+    // cout << "EXECUTE " << msg->txn_id << " :: " << get_thd_id() <<"\n";
+    // fflush(stdout);
 
     uint64_t ctime = get_sys_clock();
 
@@ -950,10 +946,9 @@ RC WorkerThread::process_execute_msg(Message *msg)
 
     crsp->copy_from_txn(txn_man);
 
-    vector<string> emptyvec;
     vector<uint64_t> dest;
     dest.push_back(txn_man->client_id);
-    msg_queue.enqueue(get_thd_id(), crsp, emptyvec, dest);
+    msg_queue.enqueue(get_thd_id(), crsp, dest);
     dest.clear();
 
     INC_STATS(_thd_id, tput_msg, 1);
@@ -1255,23 +1250,18 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
     txn_man->set_primarybatch(breq);
 
     // Storing all the signatures.
-    vector<string> emptyvec;
-    TxnManager *tman = get_transaction_manager(txn_man->get_txn_id() - 2, 0);
     for (uint64_t i = 0; i < g_node_cnt; i++)
     {
         if (i == g_node_id)
         {
             continue;
         }
-        breq->sign(i);
-        tman->allsign.push_back(breq->signature); // Redundant
-        emptyvec.push_back(breq->signature);
     }
 
     // Send the BatchRequests message to all the other replicas.
     vector<uint64_t> dest = nodes_to_send(0, g_node_cnt);
-    msg_queue.enqueue(get_thd_id(), breq, emptyvec, dest);
-    emptyvec.clear();
+    msg_queue.enqueue(get_thd_id(), breq, dest);
+    dest.clear();
 }
 
 /** Validates the contents of a message. */

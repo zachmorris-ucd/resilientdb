@@ -25,7 +25,7 @@
 
 #include "./helper.h"
 #include "pthread.h"
-#include "config.h"
+#include "../config.h"
 #include "stats.h"
 #include "pool.h"
 #include "txn_table.h"
