@@ -36,6 +36,8 @@
 #include "xed25519.h"
 #include "sha.h"
 #include "database.h"
+#include "hash_map.h"
+#include "hash_set.h"
 
 using namespace std;
 
@@ -52,6 +54,7 @@ class QryPool;
 class TxnTable;
 class QWorkQueue;
 class MessageQueue;
+class ClientResponseMessage;
 class Client_query_queue;
 class Client_txn;
 
@@ -397,6 +400,9 @@ extern double idle_worker_times[THREAD_CNT];
 
 // Statistics to print output_thread_idle_times.
 extern double output_thd_idle_time[SEND_THREAD_CNT];
+
+extern SpinLockMap<uint64_t, uint64_t> client_responses_count;
+extern SpinLockMap<uint64_t, ClientResponseMessage *> client_responses_directory;
 
 // Payload for messages.
 #if PAYLOAD_ENABLE
