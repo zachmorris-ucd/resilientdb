@@ -15,7 +15,7 @@ from sys import argv
 from hostnames import *
 import socket
 
-dashboard = None
+dashboard = True
 home_directory = "/home/expo"
 PATH = os.getcwd()
 #result_dir = PATH + "/results/"
