@@ -18,9 +18,9 @@
 /**
  * Processes an incoming client batch and sends a Pre-prepare message to al replicas.
  *
- * This function assumes that a client sends a batch of transactions and 
- * for each transaction in the batch, a separate transaction manager is created. 
- * Next, this batch is forwarded to all the replicas as a BatchRequests Message, 
+ * This function assumes that a client sends a batch of transactions and
+ * for each transaction in the batch, a separate transaction manager is created.
+ * Next, this batch is forwarded to all the replicas as a BatchRequests Message,
  * which corresponds to the Pre-Prepare stage in the PBFT protocol.
  *
  * @param msg Batch of Transactions of type CientQueryBatch from the client.
@@ -32,6 +32,9 @@ RC WorkerThread::process_client_batch(Message *msg)
     //fflush(stdout);
 
     ClientQueryBatch *clbtch = (ClientQueryBatch *)msg;
+
+    printf("ClientQueryBatch: %ld, THD: %ld :: CL: %ld :: RQ: %ld\n",msg->txn_id, get_thd_id(), msg->return_node_id, clbtch->cqrySet[0]->requests[0]->key);
+    fflush(stdout);
 
     // Authenticate the client signature.
     validate_msg(clbtch);
@@ -58,10 +61,10 @@ RC WorkerThread::process_client_batch(Message *msg)
  * Process incoming BatchRequests message from the Primary.
  *
  * This function is used by the non-primary or backup replicas to process an incoming
- * BatchRequests message sent by the primary replica. This processing would require 
- * sending messages of type PBFTPrepMessage, which correspond to the Prepare phase of 
- * the PBFT protocol. Due to network delays, it is possible that a repica may have 
- * received some messages of type PBFTPrepMessage and PBFTCommitMessage, prior to 
+ * BatchRequests message sent by the primary replica. This processing would require
+ * sending messages of type PBFTPrepMessage, which correspond to the Prepare phase of
+ * the PBFT protocol. Due to network delays, it is possible that a repica may have
+ * received some messages of type PBFTPrepMessage and PBFTCommitMessage, prior to
  * receiving this BatchRequests message.
  *
  * @param msg Batch of Transactions of type BatchRequests from the primary.
@@ -186,8 +189,8 @@ RC WorkerThread::process_batch(Message *msg)
 /**
  * Processes incoming Prepare message.
  *
- * This functions precessing incoming messages of type PBFTPrepMessage. If a replica 
- * received 2f identical Prepare messages from distinct replicas, then it creates 
+ * This functions precessing incoming messages of type PBFTPrepMessage. If a replica
+ * received 2f identical Prepare messages from distinct replicas, then it creates
  * and sends a PBFTCommitMessage to all the other replicas.
  *
  * @param msg Prepare message of type PBFTPrepMessage from a replica.
@@ -224,8 +227,8 @@ RC WorkerThread::process_pbft_prep_msg(Message *msg)
 /**
  * Checks if the incoming PBFTCommitMessage can be accepted.
  *
- * This functions checks if the hash and view of the commit message matches that of 
- * the Pre-Prepare message. Once 2f+1 messages are received it returns a true and 
+ * This functions checks if the hash and view of the commit message matches that of
+ * the Pre-Prepare message. Once 2f+1 messages are received it returns a true and
  * sets the `is_committed` flag for furtue identification.
  *
  * @param msg PBFTCommitMessage.
@@ -275,8 +278,8 @@ bool WorkerThread::committed_local(PBFTCommitMessage *msg)
 /**
  * Processes incoming Commit message.
  *
- * This functions precessing incoming messages of type PBFTCommitMessage. If a replica 
- * received 2f+1 identical Commit messages from distinct replicas, then it asks the 
+ * This functions precessing incoming messages of type PBFTCommitMessage. If a replica
+ * received 2f+1 identical Commit messages from distinct replicas, then it asks the
  * execute-thread to execute all the transactions in this batch.
  *
  * @param msg Commit message of type PBFTCommitMessage from a replica.
