@@ -198,8 +198,13 @@ enum RemReqType
     VIEW_CHANGE,
     NEW_VIEW,
 #endif
+
 #if BANKING_SMART_CONTRACT
     BSC_MSG,
+#endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+    DASC_MSG,
 #endif
 
     PBFT_PREP_MSG,   // Prepare
@@ -410,5 +415,13 @@ enum BSCType
     BSC_WITHDRAW = 2,
 };
 #endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+enum DASCType
+{
+  DASC_NEW = 0,
+};
+#endif
+
 
 #endif

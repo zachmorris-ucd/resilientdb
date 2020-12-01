@@ -5,7 +5,7 @@
 #include "txn.h"
 #include "wl.h"
 
-#if BANKING_SMART_CONTRACT
+#if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
 
 class SCWorkload : public Workload
 {

@@ -180,7 +180,32 @@ public:
 
     Array<uint64_t> inputs;
 };
-#else
+#endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+class DynamicAccessSmartContractMessage : public ClientQueryMessage
+{
+ public:
+  void copy_from_buf(char *buf);
+  void copy_to_buf(char *buf);
+  void copy_from_query(BaseQuery *query);
+  void copy_from_txn(TxnManager *txn);
+  void copy_to_txn(TxnManager *txn);
+  uint64_t get_size();
+  void init();
+  void release();
+  DynamicAccessSmartContractMessage();
+  ~DynamicAccessSmartContractMessage();
+
+  DASCType type; // Type of dynamic access Smartcontract
+  string getString();
+  string getRequestString();
+
+  Array<uint64_t> inputs;
+};
+#endif
+
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 class YCSBClientQueryMessage : public ClientQueryMessage
 {
 public:
@@ -249,6 +274,8 @@ public:
     uint64_t batch_size;
 #if BANKING_SMART_CONTRACT
     Array<BankingSmartContractMessage *> cqrySet;
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+    Array<DynamicAccessSmartContractMessage *> cqrySet;
 #else
     Array<YCSBClientQueryMessage *> cqrySet;
 #endif
@@ -293,6 +320,8 @@ public:
     void copy_from_txn(TxnManager *txn);
 #if BANKING_SMART_CONTRACT
     void copy_from_txn(TxnManager *txn, BankingSmartContractMessage *clqry);
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+    void copy_from_txn(TxnManager *txn, DynamicAccessSmartContractMessage *clqry)
 #else
     void copy_from_txn(TxnManager *txn, YCSBClientQueryMessage *clqry);
 #endif
@@ -311,6 +340,8 @@ public:
     Array<uint64_t> index;
 #if BANKING_SMART_CONTRACT
     vector<BankingSmartContractMessage *> requestMsg;
+#elif
+    vector<DynamicAccessSmartContractMessage *> requestMsg;
 #else
     vector<YCSBClientQueryMessage *> requestMsg;
 #endif

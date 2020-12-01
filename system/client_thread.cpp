@@ -93,7 +93,7 @@ RC ClientThread::run()
 		}
 		keyMTX.unlock();
 	}
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 	BaseQuery *m_query;
 #endif
 	uint64_t iters = 0;
@@ -190,7 +190,25 @@ RC ClientThread::run()
 		if (addMore % 3 == 0)
 			clqry->inputs.add(dest);
 		clqry->return_node_id = g_node_id;
-#else
+#endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+        std::string source = "test source";
+        std::string cipher_text = "test cipher text";
+        std::string capsule = "test capsule";
+		BankingSmartContractMessage *clqry = new BankingSmartContractMessage();
+		clqry->rtype = DASC_MSG;
+		clqry->inputs.init(!(addMore % 3) ? 3 : 2);
+		clqry->type = (BSCType)(addMore % 3);
+		clqry->inputs.add(amount);
+		clqry->inputs.add(source);
+		((ClientQueryMessage *)clqry)->client_startts = get_sys_clock();
+		if (addMore % 3 == 0)
+			clqry->inputs.add(dest);
+		clqry->return_node_id = g_node_id;
+#endif
+
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 		m_query = client_query_queue.get_next_query(_thd_id);
 		if (last_send_time > 0)
 		{

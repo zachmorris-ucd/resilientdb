@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     tport_man.init();
     printf("Done\n");
     printf("Initializing client manager... ");
-#if BANKING_SMART_CONTRACT
+#if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
     Workload *m_wl = new SCWorkload;
 #else
     Workload *m_wl = new YCSBWorkload;

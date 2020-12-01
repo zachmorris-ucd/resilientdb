@@ -224,7 +224,9 @@ echo -e "#define EXT_DB SQL" >> config.h
 echo -e "#define MEMORY 1" >> config.h
 echo -e "#define SQL 2" >> config.h
 echo -e "#define SQL_PERSISTENT 3" >> config.h
+echo -e "" >> config.h
 echo -e "#define BANKING_SMART_CONTRACT true" >> config.h
+echo -e "#define DYNAMIC_ACCESS_SMART_CONTRACT false" >> config.h
 echo -e "" >>config.h
 echo -e "#endif" >>config.h
 echo -e "" >>config.h

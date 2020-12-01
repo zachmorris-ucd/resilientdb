@@ -217,5 +217,8 @@
 #define SQL 2
 #define SQL_PERSISTENT 3
 
+#define BANKING_SMART_CONTRACT true
+#define DYNAMIC_ACCESS_SMART_CONTRACT false
+
 #endif
 

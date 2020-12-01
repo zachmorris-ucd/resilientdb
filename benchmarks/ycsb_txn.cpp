@@ -7,7 +7,7 @@
 #include "mem_alloc.h"
 #include "query.h"
 #include "msg_queue.h"
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 void YCSBTxnManager::init(uint64_t thd_id, Workload *h_wl)
 {
     TxnManager::init(thd_id, h_wl);

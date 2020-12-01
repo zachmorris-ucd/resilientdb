@@ -6,7 +6,7 @@
 #include "global.h"
 #include "helper.h"
 
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 class YCSBQuery;
 
 class YCSBQueryMessage;

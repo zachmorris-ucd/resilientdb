@@ -105,7 +105,15 @@ Message *Message::create_message(RemReqType rtype)
 	case BSC_MSG:
 		msg = new BankingSmartContractMessage;
 		break;
-#else
+        #endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+        case DASC_MSG:
+            msg = new DynamicAccessSmartContractMsg;
+            break;
+#endif
+
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 	case CL_QRY:
 	case RTXN:
 	case RTXN_CONT:
@@ -533,7 +541,112 @@ string BankingSmartContractMessage::getString()
 
 	return message;
 }
-#else
+#endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+void DynamicAccessSmartContractMessage::init()
+{
+}
+
+DynamicAccessSmartContractMessage::DynamicAccessSmartContractMessage() {}
+
+DynamicAccessSmartContractMessage::~DynamicAccessSmartContractMessage()
+{
+	release();
+}
+
+void DynamicAccessSmartContractMessage::release()
+{
+	ClientQueryMessage::release();
+	inputs.release();
+}
+
+uint64_t DynamicAccessSmartContractMessage::get_size()
+{
+	uint64_t size = 0;
+	size += sizeof(RemReqType);
+	size += sizeof(return_node_id);
+	size += sizeof(client_startts);
+	size += sizeof(size_t);
+	size += sizeof(uint64_t) * inputs.size();
+	size += sizeof(DASCType);
+
+	test.c_str().size()
+
+	return size;
+}
+
+void DynamicAccessSmartContractMessage::copy_from_query(BaseQuery *query) {}
+
+void DynamicAccessSmartContractMessage::copy_from_txn(TxnManager *txn) {}
+
+void DynamicAccessSmartContractMessage::copy_to_txn(TxnManager *txn) {}
+
+void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
+{
+	uint64_t ptr = 0;
+	COPY_VAL(rtype, buf, ptr);
+	COPY_VAL(return_node_id, buf, ptr);
+	COPY_VAL(client_startts, buf, ptr);
+	size_t size;
+	COPY_VAL(size, buf, ptr);
+	inputs.init(size);
+	for (uint64_t i = 0; i < size; i++)
+	{
+		uint64_t input;
+		COPY_VAL(input, buf, ptr);
+		inputs.add(input);
+	}
+
+	COPY_VAL(type, buf, ptr);
+
+	assert(ptr == get_size());
+}
+
+void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
+{
+	uint64_t ptr = 0;
+	COPY_BUF(buf, rtype, ptr);
+	COPY_BUF(buf, return_node_id, ptr);
+	COPY_BUF(buf, client_startts, ptr);
+	size_t size = inputs.size();
+	COPY_BUF(buf, size, ptr);
+	for (uint64_t i = 0; i < inputs.size(); i++)
+	{
+		uint64_t input = inputs[i];
+		COPY_BUF(buf, input, ptr);
+	}
+
+	COPY_BUF(buf, type, ptr);
+
+	assert(ptr == get_size());
+}
+
+//returns a string representation of the requests in this message
+string DynamicAccessSmartContractMessage::getRequestString()
+{
+	string message;
+	for (uint64_t i = 0; i < inputs.size(); i++)
+	{
+		message += std::to_string(inputs[i]);
+		message += " ";
+	}
+
+	return message;
+}
+
+//returns the string that needs to be signed/verified for this message
+string DynamicAccessSmartContractMessage::getString()
+{
+	string message = this->getRequestString();
+	message += " ";
+	message += to_string(this->client_startts);
+
+	return message;
+}
+#endif
+
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 void YCSBClientQueryMessage::init()
 {
 }

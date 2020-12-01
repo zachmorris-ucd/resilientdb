@@ -90,33 +90,33 @@ RC SCWorkload::get_txn_man(TxnManager *&txn_manager)
     return RCOK;
 }
 
-uint64_t SmartContract::execute()
-{
+uint64_t SmartContract::execute() {
     int result = 0;
-    switch (this->type)
-    {
-    case BSC_TRANSFER:
-    {
-        TransferMoneySmartContract *tm = (TransferMoneySmartContract *)this;
-        result = tm->execute();
-        break;
+    switch (this->type) {
+        case BSC_TRANSFER: {
+//        printf("Type: BSC_TRANSFER\n");
+            TransferMoneySmartContract
+                *tm = (TransferMoneySmartContract *) this;
+            result = tm->execute();
+            break;
+        }
+        case BSC_DEPOSIT: {
+//        printf("Type: BSC_DEPOSIT\n");
+            DepositMoneySmartContract *dm = (DepositMoneySmartContract *) this;
+            result = dm->execute();
+            break;
+        }
+        case BSC_WITHDRAW: {
+//        printf("Type: BSC_WITHDRAW\n");
+            WithdrawMoneySmartContract
+                *wm = (WithdrawMoneySmartContract *) this;
+            result = wm->execute();
+            break;
+        }
+        default:assert(0);
+            break;
     }
-    case BSC_DEPOSIT:
-    {
-        DepositMoneySmartContract *dm = (DepositMoneySmartContract *)this;
-        result = dm->execute();
-        break;
-    }
-    case BSC_WITHDRAW:
-    {
-        WithdrawMoneySmartContract *wm = (WithdrawMoneySmartContract *)this;
-        result = wm->execute();
-        break;
-    }
-    default:
-        assert(0);
-        break;
-    }
+
 
     if (result)
         return RCOK;

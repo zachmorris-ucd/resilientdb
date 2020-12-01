@@ -6,7 +6,7 @@
 #include "mem_alloc.h"
 #include "query.h"
 
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 int YCSBWorkload::next_tid;
 
 RC YCSBWorkload::init()

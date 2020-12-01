@@ -33,7 +33,16 @@ RC WorkerThread::process_client_batch(Message *msg)
 
     ClientQueryBatch *clbtch = (ClientQueryBatch *)msg;
 
-    printf("ClientQueryBatch: %ld, THD: %ld :: CL: %ld :: RQ: %ld\n",msg->txn_id, get_thd_id(), msg->return_node_id, clbtch->cqrySet[0]->requests[0]->key);
+//    printf("ClientQueryBatch: %ld, THD: %ld :: CL: %ld :: RQ: %ld\n",msg->txn_id, get_thd_id(), msg->return_node_id, clbtch->cqrySet[0]->requests[0]->key);
+    /*
+     * BSC_TRANSFER = 0,
+     * BSC_DEPOSIT = 1,
+     * BSC_WITHDRAW = 2,
+     */
+    printf("Banking contract: \n");
+    for(unsigned int i = 0; i < clbtch->cqrySet.size(); i++) {
+        printf("  message %d: %d\n", i, clbtch->cqrySet[i]->type);
+    }
     fflush(stdout);
 
     // Authenticate the client signature.

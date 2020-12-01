@@ -4,6 +4,26 @@
 #include "helper.h"
 #include "wl.h"
 
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+
+class SmartContract
+{
+public:
+  uint64_t execute();
+  DASCType type;
+};
+
+class NewCiphertextSmartContract : public SmartContract
+{
+ public:
+  uint64_t source_id;
+  std::string cipher_text_hex;
+  std::string capsule_hex;
+  uint64_t execute();
+};
+
+#endif
+
 #if BANKING_SMART_CONTRACT
 
 class SmartContract
@@ -12,6 +32,7 @@ public:
     uint64_t execute();
     BSCType type;
 };
+
 /*
 Transfer money form source account to the destination account
 Transaction will abort in case that the source account doesn't have enough money
