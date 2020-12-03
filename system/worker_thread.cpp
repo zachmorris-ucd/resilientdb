@@ -86,6 +86,7 @@ void WorkerThread::setup()
 
 void WorkerThread::process(Message *msg)
 {
+    std::cout << "Processing Message: " << msg->get_rtype() << std::endl;
     RC rc __attribute__((unused));
 
     switch (msg->get_rtype())
@@ -674,6 +675,8 @@ RC WorkerThread::run()
             idle_starttime = 0;
         }
 
+        std::cout << "---Is incoming message: " << msg->rtype << std::endl;
+
 #if VIEW_CHANGES
         // Ensure that thread 0 of the primary never processes ClientQueryBatch.
         if (g_node_id == get_current_view(get_thd_id()))
@@ -816,7 +819,7 @@ void WorkerThread::init_txn_man(BankingSmartContractMessage *bsc){
  * @param clqry One Client Transaction (or Query).
 */
 void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
-    printf("init_txn_man\n");
+    printf("--- INITIALIZING TRANSACTION MANAGER FORR THE WORKER THREAD\n");
     txn_man->client_id = dasc->return_node_id;
     txn_man->client_startts = dasc->client_startts;
     SmartContract *smart_contract;
@@ -829,7 +832,7 @@ void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
             ncsc->cipher_text_hex = dasc->inputs[1];
             ncsc->capsule_hex = dasc->inputs[2];
             ncsc->type = DASC_NEW;
-            printf("  inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
+            printf("---   inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
             smart_contract = (SmartContract *) ncsc;
             break;
         }
@@ -1250,6 +1253,8 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
         algorithm_specific_update(msg, i);
 
         init_txn_man(msg->cqrySet[i]);
+
+        cout << "Messages: " << msg->cqrySet[i]->inputs[0] << ", "  << msg->cqrySet[i]->inputs[1] << " " <<  msg->cqrySet[i]->inputs[2] << endl;
 
         // Append string representation of this txn.
         batchStr += msg->cqrySet[i]->getString();

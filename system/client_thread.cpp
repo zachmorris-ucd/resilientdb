@@ -197,7 +197,7 @@ RC ClientThread::run()
         std::string source = "test source";
         std::string cipher_text = "test cipher text";
         std::string capsule = "test capsule";
-		DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
+        DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
 		clqry->rtype = DASC_MSG;
 		clqry->inputs.init(3);
 		clqry->type = DASC_NEW;

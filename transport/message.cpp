@@ -573,6 +573,10 @@ void DynamicAccessSmartContractMessage::release()
 
 uint64_t DynamicAccessSmartContractMessage::get_size()
 {
+//    ofstream myfile;
+//    myfile.open ("transport_results.txt", ios::out | ios::app);
+    printf("Hello\n");
+
 	uint64_t size = 0;
 	size += sizeof(RemReqType);
 	size += sizeof(return_node_id);
@@ -581,7 +585,8 @@ uint64_t DynamicAccessSmartContractMessage::get_size()
 //	size += sizeof(uint64_t) * inputs.size();
 
     for(unsigned int i = 0; i < inputs.size(); i++) {
-        size += sizeof(char) * inputs[i].size() + 1;
+
+        size += sizeof(uint64_t) * inputs[i].length();
     }
 
 
@@ -589,9 +594,12 @@ uint64_t DynamicAccessSmartContractMessage::get_size()
 
     // Adding 6 because for the 3 string arguments, they will each be
     //   surrounded by quotation marks: "
-    size += 6;
+    size += sizeof(uint64_t) * 6;
 
-	return size;
+//    myfile << "Size: " << size << std::endl;
+//    myfile.close();
+
+    return size;
 }
 
 void DynamicAccessSmartContractMessage::copy_from_query(BaseQuery *query) {}
@@ -602,7 +610,11 @@ void DynamicAccessSmartContractMessage::copy_to_txn(TxnManager *txn) {}
 
 void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 {
-    printf("COPYING FROM BUFFER: %s", buf);
+    ofstream myfile;
+    myfile.open("transport_copy_from_buf_results.txt", ios::out | ios::app);
+
+    myfile << "COPYING FROM BUFFER: " << buf << std::endl;
+
 	uint64_t ptr = 0;
 
 	/*
@@ -626,7 +638,7 @@ void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 		if(input == '\"') {
 	        if(reconstructing_string) {
                 inputs.add(reconstructed_string);
-                printf("Added input %s\n", reconstructed_string.c_str());
+                myfile << "Added input " << reconstructed_string.c_str() << std::endl;
                 reconstructed_string = "";
                 reconstructing_string = false;
             } else {
@@ -635,20 +647,23 @@ void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 		} else if(reconstructing_string) {
 		    reconstructed_string += input;
 		} else {
-            printf("Found unknown value: '%hhd'\n", input);
+            myfile << "Found unknown value: '" << input << "'" << std::endl;
 		}
 	}
 
 	COPY_VAL(type, buf, ptr);
 
-    std::cout << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
+    myfile << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
+    myfile.close();
 
 	assert(ptr == get_size());
 }
 
 void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 {
-    printf("COPYING TO BUFFER\n");
+    ofstream myfile;
+    myfile.open ("transport_copy_to_buf_results.txt", ios::out | ios::app);
+    myfile << "COPYING TO BUFFER\n";
 	uint64_t ptr = 0;
 
 	/*
@@ -680,8 +695,9 @@ void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 
 	COPY_BUF(buf, type, ptr);
 
-	printf("CREATED BUFFER: %s", buf);
-    std::cout << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
+	myfile << "CREATED BUFFER: '" << std::string(buf) << "'" << std::endl;
+    myfile << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
+    myfile.close();
 
 	assert(ptr == get_size());
 }
@@ -696,7 +712,8 @@ string DynamicAccessSmartContractMessage::getRequestString()
 		message += " ";
 	}
 
-	return message;
+    printf("Got request string: %s\n", message.c_str());
+    return message;
 }
 
 //returns the string that needs to be signed/verified for this message

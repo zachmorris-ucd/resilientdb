@@ -1,0 +1,23 @@
+Getting size of test source, test cipher text, and test capsule
+ added size 88 to make 39
+ added size 128 to make 55
+ added size 96 to make 67
+Size: 77
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size Result: 392
+COPYING TO BUFFER
+Size: 392, Size Result: 392
+COPYING TO BUFFER
+Size: 392, Size Result: 392
