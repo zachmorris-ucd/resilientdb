@@ -193,18 +193,18 @@ RC ClientThread::run()
 #endif
 
 #if DYNAMIC_ACCESS_SMART_CONTRACT
+//		printf("running smart contract\n");
         std::string source = "test source";
         std::string cipher_text = "test cipher text";
         std::string capsule = "test capsule";
-		BankingSmartContractMessage *clqry = new BankingSmartContractMessage();
+		DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
 		clqry->rtype = DASC_MSG;
-		clqry->inputs.init(!(addMore % 3) ? 3 : 2);
-		clqry->type = (BSCType)(addMore % 3);
-		clqry->inputs.add(amount);
+		clqry->inputs.init(3);
+		clqry->type = DASC_NEW;
 		clqry->inputs.add(source);
+		clqry->inputs.add(cipher_text);
+		clqry->inputs.add(capsule);
 		((ClientQueryMessage *)clqry)->client_startts = get_sys_clock();
-		if (addMore % 3 == 0)
-			clqry->inputs.add(dest);
 		clqry->return_node_id = g_node_id;
 #endif
 

@@ -39,11 +39,13 @@ RC WorkerThread::process_client_batch(Message *msg)
      * BSC_DEPOSIT = 1,
      * BSC_WITHDRAW = 2,
      */
-    printf("Banking contract: \n");
+    printf("Contract: \n");
     for(unsigned int i = 0; i < clbtch->cqrySet.size(); i++) {
         printf("  message %d: %d\n", i, clbtch->cqrySet[i]->type);
     }
     fflush(stdout);
+
+//    printf("")
 
     // Authenticate the client signature.
     validate_msg(clbtch);

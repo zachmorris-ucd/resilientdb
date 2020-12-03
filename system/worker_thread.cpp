@@ -809,6 +809,36 @@ void WorkerThread::init_txn_man(BankingSmartContractMessage *bsc){
     }
     txn_man->smart_contract = smart_contract;
 }
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+/**
+ * This function sets up the required fields of the txn manager.
+ *
+ * @param clqry One Client Transaction (or Query).
+*/
+void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
+    printf("init_txn_man\n");
+    txn_man->client_id = dasc->return_node_id;
+    txn_man->client_startts = dasc->client_startts;
+    SmartContract *smart_contract;
+    switch (dasc->type)
+    {
+        case DASC_NEW:
+        {
+            NewCiphertextSmartContract *ncsc = new NewCiphertextSmartContract();
+            ncsc->source_id = std::stoi(dasc->inputs[0]);
+            ncsc->cipher_text_hex = dasc->inputs[1];
+            ncsc->capsule_hex = dasc->inputs[2];
+            ncsc->type = DASC_NEW;
+            printf("  inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
+            smart_contract = (SmartContract *) ncsc;
+            break;
+        }
+        default:
+            assert(0);
+            break;
+    }
+    txn_man->smart_contract = smart_contract;
+}
 #else
 
 /**

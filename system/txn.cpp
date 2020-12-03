@@ -132,7 +132,7 @@ void TxnManager::init(uint64_t pool_id, Workload *h_wl)
         DEBUG_M("Transaction alloc\n");
         txn_pool.get(pool_id, txn);
     }
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
     if (!query)
     {
         DEBUG_M("TxnManager::init Query alloc\n");
@@ -166,7 +166,7 @@ void TxnManager::reset()
     //twopl_wait_start = 0;
 
     assert(txn);
-#if BANKING_SMART_CONTRACT
+#if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
     //assert(smart_contract);
 #else
     assert(query);
@@ -181,7 +181,7 @@ void TxnManager::release(uint64_t pool_id)
 {
 
     uint64_t tid = get_txn_id();
-#if BANKING_SMART_CONTRACT
+#if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
     delete this->smart_contract;
 #else
     qry_pool.put(pool_id, query);
@@ -205,7 +205,7 @@ void TxnManager::release(uint64_t pool_id)
 
 void TxnManager::reset_query()
 {
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
     ((YCSBQuery *)query)->reset();
 #endif
 }
@@ -291,7 +291,7 @@ uint64_t TxnManager::get_thd_id()
 
 BaseQuery *TxnManager::get_query()
 {
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
     return query;
 #else
     return NULL;
@@ -300,7 +300,7 @@ BaseQuery *TxnManager::get_query()
 
 void TxnManager::set_query(BaseQuery *qry)
 {
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
     query = qry;
 #endif
 }

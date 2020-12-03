@@ -16,6 +16,7 @@ Smartt Contract Transaction Manager and Workload
 
 void SmartContractTxn::init(uint64_t thd_id, Workload *h_wl)
 {
+    printf("INITIALIZING DYNAMIC ACCESS SMART CONTRACT INIT\n");
     TxnManager::init(thd_id, h_wl);
     _wl = (SCWorkload *)h_wl;
     reset();
@@ -34,6 +35,7 @@ RC SmartContractTxn::run_txn()
 
 RC SCWorkload::init()
 {
+    printf("INITIALIZING DYNAMIC ACCESS SMART CONTRACT WORKLOAD\n");
     Workload::init();
     return RCOK;
 }
@@ -49,31 +51,19 @@ RC SCWorkload::get_txn_man(TxnManager *&txn_manager)
 
 uint64_t SmartContract::execute()
 {
+    printf("Executing dynamic access smart contract\n");
     int result = 0;
     switch (this->type)
     {
-    case BSC_TRANSFER:
+    case DASC_NEW:
     {
-//        printf("Type: BSC_TRANSFER\n");
-        TransferMoneySmartContract *tm = (TransferMoneySmartContract *)this;
-        result = tm->execute();
-        break;
-    }
-    case BSC_DEPOSIT:
-    {
-//        printf("Type: BSC_DEPOSIT\n");
-        DepositMoneySmartContract *dm = (DepositMoneySmartContract *)this;
-        result = dm->execute();
-        break;
-    }
-    case BSC_WITHDRAW:
-    {
-//        printf("Type: BSC_WITHDRAW\n");
-        WithdrawMoneySmartContract *wm = (WithdrawMoneySmartContract *)this;
-        result = wm->execute();
+        printf("Type: DASC_NEWE\n");
+        NewCiphertextSmartContract *nc = (NewCiphertextSmartContract *)this;
+        result = nc->execute();
         break;
     }
     default:
+        printf("ERROR: Couldn't find type\n");
         assert(0);
         break;
     }

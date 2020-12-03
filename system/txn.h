@@ -116,7 +116,7 @@ public:
     void set_batch_id(uint64_t batch_id) { txn->batch_id = batch_id; }
 
     Transaction *txn;
-#if BANKING_SMART_CONTRACT
+#if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
     SmartContract *smart_contract;
 #else
     BaseQuery *query; // Client query.

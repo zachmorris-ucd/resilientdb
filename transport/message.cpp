@@ -62,7 +62,7 @@ Message *Message::create_message(TxnManager *txn, RemReqType rtype)
 	return msg;
 }
 
-#if !BANKING_SMART_CONTRACT
+#if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
 Message *Message::create_message(BaseQuery *query, RemReqType rtype)
 {
 	assert(rtype == CL_QRY);
@@ -109,7 +109,7 @@ Message *Message::create_message(RemReqType rtype)
 
 #if DYNAMIC_ACCESS_SMART_CONTRACT
         case DASC_MSG:
-            msg = new DynamicAccessSmartContractMsg;
+            msg = new DynamicAccessSmartContractMessage;
             break;
 #endif
 
@@ -318,6 +318,13 @@ void Message::release_message(Message *msg)
 		delete m_msg;
 		break;
 	}
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+	    case DASC_MSG: {
+            DynamicAccessSmartContractMessage *m_msg = (DynamicAccessSmartContractMessage *)msg;
+            m_msg->release();
+            delete m_msg;
+            break;
+        }
 #else
 	case CL_QRY:
 	{
@@ -516,6 +523,8 @@ void BankingSmartContractMessage::copy_to_buf(char *buf)
 
 	COPY_BUF(buf, type, ptr);
 
+	printf("copy_to_buf: %s", buf);
+
 	assert(ptr == get_size());
 }
 
@@ -529,6 +538,7 @@ string BankingSmartContractMessage::getRequestString()
 		message += " ";
 	}
 
+    printf("Got request string: %s\n", message.c_str());
 	return message;
 }
 
@@ -568,10 +578,18 @@ uint64_t DynamicAccessSmartContractMessage::get_size()
 	size += sizeof(return_node_id);
 	size += sizeof(client_startts);
 	size += sizeof(size_t);
-	size += sizeof(uint64_t) * inputs.size();
+//	size += sizeof(uint64_t) * inputs.size();
+
+    for(unsigned int i = 0; i < inputs.size(); i++) {
+        size += sizeof(char) * inputs[i].size() + 1;
+    }
+
+
 	size += sizeof(DASCType);
 
-	test.c_str().size()
+    // Adding 6 because for the 3 string arguments, they will each be
+    //   surrounded by quotation marks: "
+    size += 6;
 
 	return size;
 }
@@ -584,28 +602,59 @@ void DynamicAccessSmartContractMessage::copy_to_txn(TxnManager *txn) {}
 
 void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 {
+    printf("COPYING FROM BUFFER: %s", buf);
 	uint64_t ptr = 0;
+
+	/*
+	 * I commented this out because (I think) it's uneccessary?
+	 */
+
 	COPY_VAL(rtype, buf, ptr);
 	COPY_VAL(return_node_id, buf, ptr);
 	COPY_VAL(client_startts, buf, ptr);
 	size_t size;
 	COPY_VAL(size, buf, ptr);
 	inputs.init(size);
+
+	bool reconstructing_string = false;
+	std::string reconstructed_string("");
 	for (uint64_t i = 0; i < size; i++)
 	{
-		uint64_t input;
+		char input;
 		COPY_VAL(input, buf, ptr);
-		inputs.add(input);
+
+		if(input == '\"') {
+	        if(reconstructing_string) {
+                inputs.add(reconstructed_string);
+                printf("Added input %s\n", reconstructed_string.c_str());
+                reconstructed_string = "";
+                reconstructing_string = false;
+            } else {
+	            reconstructing_string = true;
+	        }
+		} else if(reconstructing_string) {
+		    reconstructed_string += input;
+		} else {
+            printf("Found unknown value: '%hhd'\n", input);
+		}
 	}
 
 	COPY_VAL(type, buf, ptr);
+
+    std::cout << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
 
 	assert(ptr == get_size());
 }
 
 void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 {
+    printf("COPYING TO BUFFER\n");
 	uint64_t ptr = 0;
+
+	/*
+	 * I commented this out because (I think) it's uneccessary?
+	 */
+
 	COPY_BUF(buf, rtype, ptr);
 	COPY_BUF(buf, return_node_id, ptr);
 	COPY_BUF(buf, client_startts, ptr);
@@ -613,11 +662,26 @@ void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 	COPY_BUF(buf, size, ptr);
 	for (uint64_t i = 0; i < inputs.size(); i++)
 	{
-		uint64_t input = inputs[i];
-		COPY_BUF(buf, input, ptr);
+		string input = inputs[i];
+
+		// This is (hopefully) modified to store a string like: "message here"
+        uint64_t input_char = '\"';
+		COPY_BUF(buf, input_char, ptr);
+
+		for(unsigned int j = 0; j < input.length(); j++) {
+	        input_char = input[j];
+
+            COPY_BUF(buf, input_char, ptr);
+		}
+
+        input_char = '\"';
+        COPY_BUF(buf, input_char, ptr);
 	}
 
 	COPY_BUF(buf, type, ptr);
+
+	printf("CREATED BUFFER: %s", buf);
+    std::cout << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
 
 	assert(ptr == get_size());
 }
@@ -628,7 +692,7 @@ string DynamicAccessSmartContractMessage::getRequestString()
 	string message;
 	for (uint64_t i = 0; i < inputs.size(); i++)
 	{
-		message += std::to_string(inputs[i]);
+		message += inputs[i];
 		message += " ";
 	}
 
@@ -1368,6 +1432,8 @@ void ClientQueryBatch::copy_from_buf(char *buf)
 		ptr += msg->get_size();
 #if BANKING_SMART_CONTRACT
 		cqrySet.add((BankingSmartContractMessage *)msg);
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+        cqrySet.add((DynamicAccessSmartContractMessage *)msg);
 #else
 		cqrySet.add((YCSBClientQueryMessage *)msg);
 #endif
@@ -1490,6 +1556,23 @@ void BatchRequests::copy_from_txn(TxnManager *txn, BankingSmartContractMessage *
 	this->requestMsg[idx] = yqry;
 	this->index.add(txnid);
 }
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+void BatchRequests::copy_from_txn(TxnManager *txn, DynamicAccessSmartContractMessage *clqry)
+{
+    // Index of the transaction in this bacth.
+    uint64_t txnid = txn->get_txn_id();
+    uint64_t idx = txnid % get_batch_size();
+
+    // TODO: Some memory is getting consumed while storing client query.
+    char *bfr = (char *)malloc(clqry->get_size() + 1);
+    clqry->copy_to_buf(bfr);
+    Message *tmsg = Message::create_message(bfr);
+    DynamicAccessSmartContractMessage *yqry = (DynamicAccessSmartContractMessage *)tmsg;
+    free(bfr);
+
+    this->requestMsg[idx] = yqry;
+    this->index.add(txnid);
+}
 #else
 void BatchRequests::copy_from_txn(TxnManager *txn, YCSBClientQueryMessage *clqry)
 {
@@ -1559,6 +1642,8 @@ void BatchRequests::copy_from_buf(char *buf)
 		ptr += msg->get_size();
 #if BANKING_SMART_CONTRACT
 		requestMsg[i] = (BankingSmartContractMessage *)msg;
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+        requestMsg[i] = (DynamicAccessSmartContractMessage *)msg;
 #else
 		requestMsg[i] = (YCSBClientQueryMessage *)msg;
 #endif

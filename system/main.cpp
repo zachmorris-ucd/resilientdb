@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     simulation->init();
     printf("Done\n");
     fflush(stdout);
-#if BANKING_SMART_CONTRACT
+#if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
     Workload *m_wl = new SCWorkload;
 #else
     Workload *m_wl = new YCSBWorkload;

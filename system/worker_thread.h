@@ -38,6 +38,8 @@ public:
     RC process_pbft_chkpt_msg(Message *msg);
 #if BANKING_SMART_CONTRACT
     void init_txn_man(BankingSmartContractMessage *bscm);
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
+    void init_txn_man(DynamicAccessSmartContractMessage *dascm);
 #else
     void init_txn_man(YCSBClientQueryMessage *msg);
 #endif

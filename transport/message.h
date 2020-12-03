@@ -201,7 +201,7 @@ class DynamicAccessSmartContractMessage : public ClientQueryMessage
   string getString();
   string getRequestString();
 
-  Array<uint64_t> inputs;
+  Array<std::string> inputs;
 };
 #endif
 
@@ -321,7 +321,7 @@ public:
 #if BANKING_SMART_CONTRACT
     void copy_from_txn(TxnManager *txn, BankingSmartContractMessage *clqry);
 #elif DYNAMIC_ACCESS_SMART_CONTRACT
-    void copy_from_txn(TxnManager *txn, DynamicAccessSmartContractMessage *clqry)
+    void copy_from_txn(TxnManager *txn, DynamicAccessSmartContractMessage *clqry);
 #else
     void copy_from_txn(TxnManager *txn, YCSBClientQueryMessage *clqry);
 #endif
@@ -340,7 +340,7 @@ public:
     Array<uint64_t> index;
 #if BANKING_SMART_CONTRACT
     vector<BankingSmartContractMessage *> requestMsg;
-#elif
+#elif DYNAMIC_ACCESS_SMART_CONTRACT
     vector<DynamicAccessSmartContractMessage *> requestMsg;
 #else
     vector<YCSBClientQueryMessage *> requestMsg;
