@@ -222,7 +222,6 @@ RC ClientThread::run()
 
 		YCSBClientQueryMessage *clqry = (YCSBClientQueryMessage *)msg;
 		clqry->return_node = g_node_id;
-
 #endif
 
 		bmsg->cqrySet.add(clqry);

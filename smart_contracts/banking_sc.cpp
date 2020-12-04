@@ -24,6 +24,8 @@ uint64_t TransferMoneySmartContract::execute()
     return 0;
 }
 
+*/
+
 /*
 returns:
      1 for commit 
