@@ -204,6 +204,7 @@ class DynamicAccessSmartContractMessage : public ClientQueryMessage
   string input_source;
   string input_cipher_text;
   string input_capsule;
+
 //  vector<std::string>
 //  Array<std::string> inputs;
 };

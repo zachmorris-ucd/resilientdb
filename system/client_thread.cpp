@@ -200,13 +200,8 @@ RC ClientThread::run()
         DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
         clqry->rtype = DASC_MSG;
 
-//        uint64_t size = sizeof(char) * (source.length() + cipher_text.length() + capsule.length() + 3);
 
-//        clqry->inputs.init(size);
-        clqry->type = DASC_NEW;
-//        clqry->inputs.add(source);
-//        clqry->inputs.add(cipher_text);
-//        clqry->inputs.add(capsule);
+        clqry->type = DASC_UPLOAD_CIPHERTEXT;
         clqry->input_capsule = capsule;
         clqry->input_cipher_text = cipher_text;
         clqry->input_source = source;

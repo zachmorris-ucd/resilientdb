@@ -61,7 +61,7 @@ uint64_t SmartContract::execute()
     int result = 0;
     switch (this->type)
     {
-    case DASC_NEW:
+    case DASC_UPLOAD_CIPHERTEXT:
     {
         printf("Type: DASC_NEWE\n");
         NewCiphertextSmartContract *nc = (NewCiphertextSmartContract *)this;

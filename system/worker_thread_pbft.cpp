@@ -41,7 +41,7 @@ RC WorkerThread::process_client_batch(Message *msg)
      */
     printf("Contract: \n");
     for(unsigned int i = 0; i < clbtch->cqrySet.size(); i++) {
-        printf("  message %d: %d\n", i, clbtch->cqrySet[i]->type);
+        printf("  message %d: %s\n", i, clbtch->cqrySet[i]->input_source.c_str());
     }
     fflush(stdout);
 

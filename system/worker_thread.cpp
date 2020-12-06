@@ -825,13 +825,13 @@ void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
     SmartContract *smart_contract;
     switch (dasc->type)
     {
-        case DASC_NEW:
+        case DASC_UPLOAD_CIPHERTEXT:
         {
             NewCiphertextSmartContract *ncsc = new NewCiphertextSmartContract();
-            ncsc->source_id = std::stoi(dasc->input_source);
+            ncsc->public_key = dasc->input_source;
             ncsc->cipher_text_hex = dasc->input_cipher_text;
             ncsc->capsule_hex = dasc->input_capsule;
-            ncsc->type = DASC_NEW;
+            ncsc->type = DASC_UPLOAD_CIPHERTEXT;
 //            printf("---   inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
             smart_contract = (SmartContract *) ncsc;
             break;

@@ -16,7 +16,7 @@ public:
 class NewCiphertextSmartContract : public SmartContract
 {
  public:
-  uint64_t source_id;
+//  uint64_t source_id;
   std::string public_key;
   std::string cipher_text_hex;
   std::string capsule_hex;

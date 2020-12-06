@@ -575,10 +575,12 @@ uint64_t DynamicAccessSmartContractMessage::get_size()
 {
 //    printf("DynamicAccessSmartContractMessage::get_size\n");
 
+    // RemReqType return_node_id client_startss 3 4 abcd 5 abcde 2 ab DASCType
+
 	uint64_t size = 0;
-	size += sizeof(RemReqType);
-	size += sizeof(return_node_id);
-	size += sizeof(client_startts);
+	size += sizeof(RemReqType); //4
+	size += sizeof(return_node_id); //8
+	size += sizeof(client_startts); // 8
 //	size += sizeof(size_t);
 
 //    for(unsigned int i = 0; i < inputs.size(); i++) {
@@ -588,7 +590,7 @@ uint64_t DynamicAccessSmartContractMessage::get_size()
 //    }
 
     // For the 3 size integers
-    size += 3;
+    size += 24;
     size += input_source.size();
     size += input_cipher_text.size();
     size += input_capsule.size();
@@ -654,6 +656,7 @@ void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 	COPY_VAL(type, buf, ptr);
 
 	printf("DONE copy_from_buf\n");
+	cout << "Ptr: " << ptr << ", get_size(): " << get_size() << endl;
     fflush(stdout);
 	assert(ptr == get_size());
 }
@@ -725,7 +728,9 @@ void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 	COPY_BUF(buf, type, ptr);
 
 	cout << "CREATED BUFFER" << std::endl;
+    cout << "Ptr: " << ptr << ", get_size(): " << get_size() << endl;
     fflush(stdout);
+    // get_size 66: ptr 86
 	assert(ptr == get_size());
 }
 
