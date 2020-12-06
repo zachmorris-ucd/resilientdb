@@ -828,11 +828,11 @@ void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
         case DASC_NEW:
         {
             NewCiphertextSmartContract *ncsc = new NewCiphertextSmartContract();
-            ncsc->source_id = std::stoi(dasc->inputs[0]);
-            ncsc->cipher_text_hex = dasc->inputs[1];
-            ncsc->capsule_hex = dasc->inputs[2];
+            ncsc->source_id = std::stoi(dasc->input_source);
+            ncsc->cipher_text_hex = dasc->input_cipher_text;
+            ncsc->capsule_hex = dasc->input_capsule;
             ncsc->type = DASC_NEW;
-            printf("---   inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
+//            printf("---   inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
             smart_contract = (SmartContract *) ncsc;
             break;
         }
@@ -1254,7 +1254,7 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
 
         init_txn_man(msg->cqrySet[i]);
 
-        cout << "Messages: " << msg->cqrySet[i]->inputs[0] << ", "  << msg->cqrySet[i]->inputs[1] << " " <<  msg->cqrySet[i]->inputs[2] << endl;
+        cout << "Messages: " << msg->cqrySet[i]->input_source << ", "  << msg->cqrySet[i]->input_cipher_text << " " <<  msg->cqrySet[i]->input_capsule << endl;
 
         // Append string representation of this txn.
         batchStr += msg->cqrySet[i]->getString();

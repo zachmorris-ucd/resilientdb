@@ -119,7 +119,7 @@ RC ClientThread::run()
 		progress_stats();
 		int32_t inf_cnt;
 		uint32_t next_node = get_view();
-		next_node_id = get_view();
+        next_node_id = get_view();
 
 #if VIEW_CHANGES
 		//if a request by this client hasnt been completed in time
@@ -172,7 +172,7 @@ RC ClientThread::run()
 
 #else // If client batching enable
 
-		if ((inf_cnt = client_man.inc_inflight(next_node)) < 0)
+        if ((inf_cnt = client_man.inc_inflight(next_node)) < 0)
 		{
 			continue;
 		}
@@ -198,14 +198,20 @@ RC ClientThread::run()
         std::string cipher_text = "test cipher text";
         std::string capsule = "test capsule";
         DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
-		clqry->rtype = DASC_MSG;
-		clqry->inputs.init(3);
-		clqry->type = DASC_NEW;
-		clqry->inputs.add(source);
-		clqry->inputs.add(cipher_text);
-		clqry->inputs.add(capsule);
-		((ClientQueryMessage *)clqry)->client_startts = get_sys_clock();
-		clqry->return_node_id = g_node_id;
+        clqry->rtype = DASC_MSG;
+
+//        uint64_t size = sizeof(char) * (source.length() + cipher_text.length() + capsule.length() + 3);
+
+//        clqry->inputs.init(size);
+        clqry->type = DASC_NEW;
+//        clqry->inputs.add(source);
+//        clqry->inputs.add(cipher_text);
+//        clqry->inputs.add(capsule);
+        clqry->input_capsule = capsule;
+        clqry->input_cipher_text = cipher_text;
+        clqry->input_source = source;
+        ((ClientQueryMessage *)clqry)->client_startts = get_sys_clock();
+        clqry->return_node_id = g_node_id;
 #endif
 
 #if !BANKING_SMART_CONTRACT && !DYNAMIC_ACCESS_SMART_CONTRACT
@@ -227,10 +233,10 @@ RC ClientThread::run()
 		bmsg->cqrySet.add(clqry);
 		addMore++;
 
-		// Resetting and sending the message
+        // Resetting and sending the message
 		if (addMore == g_batch_size)
 		{
-			bmsg->sign(next_node_id); // Sign the message.
+            bmsg->sign(next_node_id); // Sign the message.
 
 #if TIMER_ON
 			char *buf = create_msg_buffer(bmsg);
@@ -244,20 +250,21 @@ RC ClientThread::run()
 			vector<string> emptyvec;
 			emptyvec.push_back(bmsg->signature);
 
-			vector<uint64_t> dest;
+            vector<uint64_t> dest;
 			dest.push_back(next_node_id);
 			msg_queue.enqueue(get_thd_id(), bmsg, emptyvec, dest);
 			dest.clear();
 
-			num_txns_sent += g_batch_size;
+            num_txns_sent += g_batch_size;
 			txns_sent[next_node] += g_batch_size;
 			INC_STATS(get_thd_id(), txn_sent_cnt, g_batch_size);
 
-			mssg = Message::create_message(CL_BATCH);
+            mssg = Message::create_message(CL_BATCH);
 			bmsg = (ClientQueryBatch *)mssg;
 			bmsg->init();
 			addMore = 0;
-		}
+
+        }
 
 #endif // Batch Enable
 	}

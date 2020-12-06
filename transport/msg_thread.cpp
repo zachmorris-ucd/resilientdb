@@ -110,7 +110,9 @@ void MessageThread::run()
             send_batch(dest_node_id);
         }
 
+        fflush(stdout);
         msg->copy_to_buf(&(sbuf->buffer[sbuf->ptr]));
+        fflush(stdout);
 
         sbuf->cnt += 1;
         sbuf->ptr += msg->get_size();

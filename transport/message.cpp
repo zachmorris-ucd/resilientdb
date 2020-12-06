@@ -568,36 +568,36 @@ DynamicAccessSmartContractMessage::~DynamicAccessSmartContractMessage()
 void DynamicAccessSmartContractMessage::release()
 {
 	ClientQueryMessage::release();
-	inputs.release();
+//	inputs.release();
 }
 
 uint64_t DynamicAccessSmartContractMessage::get_size()
 {
-//    ofstream myfile;
-//    myfile.open ("transport_results.txt", ios::out | ios::app);
-    printf("Hello\n");
+//    printf("DynamicAccessSmartContractMessage::get_size\n");
 
 	uint64_t size = 0;
 	size += sizeof(RemReqType);
 	size += sizeof(return_node_id);
 	size += sizeof(client_startts);
-	size += sizeof(size_t);
-//	size += sizeof(uint64_t) * inputs.size();
+//	size += sizeof(size_t);
 
-    for(unsigned int i = 0; i < inputs.size(); i++) {
+//    for(unsigned int i = 0; i < inputs.size(); i++) {
+////        size += sizeof(uint64_t) * inputs[i].length();
+//        size += inputs[i].length();
+//        size += sizeof(uint64_t);
+//    }
 
-        size += sizeof(uint64_t) * inputs[i].length();
-    }
-
+    // For the 3 size integers
+    size += 3;
+    size += input_source.size();
+    size += input_cipher_text.size();
+    size += input_capsule.size();
 
 	size += sizeof(DASCType);
 
     // Adding 6 because for the 3 string arguments, they will each be
     //   surrounded by quotation marks: "
-    size += sizeof(uint64_t) * 6;
-
-//    myfile << "Size: " << size << std::endl;
-//    myfile.close();
+//    size += sizeof(uint64_t) * 6;
 
     return size;
 }
@@ -610,12 +610,10 @@ void DynamicAccessSmartContractMessage::copy_to_txn(TxnManager *txn) {}
 
 void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 {
-    ofstream myfile;
-    myfile.open("transport_copy_from_buf_results.txt", ios::out | ios::app);
+    printf("DynamicAccessSmartContractMessage::copy_from_buf\n");
+    fflush(stdout);
 
-    myfile << "COPYING FROM BUFFER: " << buf << std::endl;
-
-	uint64_t ptr = 0;
+    uint64_t ptr = 0;
 
 	/*
 	 * I commented this out because (I think) it's uneccessary?
@@ -624,46 +622,46 @@ void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 	COPY_VAL(rtype, buf, ptr);
 	COPY_VAL(return_node_id, buf, ptr);
 	COPY_VAL(client_startts, buf, ptr);
-	size_t size;
-	COPY_VAL(size, buf, ptr);
-	inputs.init(size);
+//	size_t size;
+//	COPY_VAL(size, buf, ptr);
+//	inputs.init(size);
 
-	bool reconstructing_string = false;
-	std::string reconstructed_string("");
-	for (uint64_t i = 0; i < size; i++)
-	{
-		char input;
-		COPY_VAL(input, buf, ptr);
+//    for (uint64_t i = 0; i < size; i++)
+//    {
+//        uint64_t input_size;
+//        std::string input;
+//
+//        COPY_VAL(input_size, buf, ptr);
+//
+//        ptr = buf_to_string(buf, ptr, input, input_size);
+//        inputs.add(input);
+//    }
 
-		if(input == '\"') {
-	        if(reconstructing_string) {
-                inputs.add(reconstructed_string);
-                myfile << "Added input " << reconstructed_string.c_str() << std::endl;
-                reconstructed_string = "";
-                reconstructing_string = false;
-            } else {
-	            reconstructing_string = true;
-	        }
-		} else if(reconstructing_string) {
-		    reconstructed_string += input;
-		} else {
-            myfile << "Found unknown value: '" << input << "'" << std::endl;
-		}
-	}
+    // size-of-source source size-of-cipher cipher size-of-capsule capsule
+
+    uint64_t input_size;
+
+    COPY_VAL(input_size, buf, ptr);
+    ptr = buf_to_string(buf, ptr, input_source, input_size);
+
+    COPY_VAL(input_size, buf, ptr);
+    ptr = buf_to_string(buf, ptr, input_cipher_text, input_size);
+
+    COPY_VAL(input_size, buf, ptr);
+    ptr = buf_to_string(buf, ptr, input_capsule, input_size);
+
 
 	COPY_VAL(type, buf, ptr);
 
-    myfile << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
-    myfile.close();
-
+	printf("DONE copy_from_buf\n");
+    fflush(stdout);
 	assert(ptr == get_size());
 }
 
 void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 {
-    ofstream myfile;
-    myfile.open ("transport_copy_to_buf_results.txt", ios::out | ios::app);
-    myfile << "COPYING TO BUFFER\n";
+    printf("DynamicAccessSmartContractMessage::copy_to_buf\n");
+    fflush(stdout);
 	uint64_t ptr = 0;
 
 	/*
@@ -673,56 +671,89 @@ void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 	COPY_BUF(buf, rtype, ptr);
 	COPY_BUF(buf, return_node_id, ptr);
 	COPY_BUF(buf, client_startts, ptr);
-	size_t size = inputs.size();
-	COPY_BUF(buf, size, ptr);
-	for (uint64_t i = 0; i < inputs.size(); i++)
+
+	uint64_t input_size;
+	char v;
+
+	input_size = input_source.size();
+	COPY_BUF(buf, input_size, ptr);
+	for (uint64_t i = 0; i < input_size; i++)
 	{
-		string input = inputs[i];
-
-		// This is (hopefully) modified to store a string like: "message here"
-        uint64_t input_char = '\"';
-		COPY_BUF(buf, input_char, ptr);
-
-		for(unsigned int j = 0; j < input.length(); j++) {
-	        input_char = input[j];
-
-            COPY_BUF(buf, input_char, ptr);
-		}
-
-        input_char = '\"';
-        COPY_BUF(buf, input_char, ptr);
+	    v = input_source[i];
+	    COPY_BUF(buf, v, ptr);
 	}
+
+    input_size = input_cipher_text.size();
+    COPY_BUF(buf, input_size, ptr);
+    for (uint64_t i = 0; i < input_size; i++)
+    {
+        v = input_cipher_text[i];
+        COPY_BUF(buf, v, ptr);
+    }
+
+    input_size = input_capsule.size();
+    COPY_BUF(buf, input_size, ptr);
+    for (uint64_t i = 0; i < input_size; i++)
+    {
+        v = input_capsule[i];
+        COPY_BUF(buf, v, ptr);
+    }
+
+
+////	size_t size = inputs.size();
+////	COPY_BUF(buf, size, ptr);
+//
+//    for (uint64_t i = 0; i < inputs.size(); i++)
+//    {
+//        std::string input = inputs[i];
+//        uint64_t input_size = input.size();
+//        // -=
+//        COPY_BUF(buf, input_size, ptr);
+//
+//        char v;
+//        for (uint64_t i = 0; i < input_size; i++)
+//        {
+//            v = input[i];
+//            COPY_BUF(buf, v, ptr);
+//        }
+//        // -=
+////        uint64_t input = inputs[i];
+////        COPY_BUF(buf, input, ptr);
+//    }
+
 
 	COPY_BUF(buf, type, ptr);
 
-	myfile << "CREATED BUFFER: '" << std::string(buf) << "'" << std::endl;
-    myfile << "Size: " << get_size() << ", Size Result: " << ptr << std::endl;
-    myfile.close();
-
+	cout << "CREATED BUFFER" << std::endl;
+    fflush(stdout);
 	assert(ptr == get_size());
 }
 
 //returns a string representation of the requests in this message
 string DynamicAccessSmartContractMessage::getRequestString()
 {
+//    printf("Getting request string\n");
 	string message;
-	for (uint64_t i = 0; i < inputs.size(); i++)
-	{
-		message += inputs[i];
-		message += " ";
-	}
+//	for (uint64_t i = 0; i < inputs.size(); i++)
+//	{
+//		message += inputs[i];
+//		message += " ";
+//	}
+    message += input_source + " " + input_cipher_text + " " + input_capsule;
 
-    printf("Got request string: %s\n", message.c_str());
+//    printf("Got request string: %s\n", message.c_str());
     return message;
 }
 
 //returns the string that needs to be signed/verified for this message
 string DynamicAccessSmartContractMessage::getString()
 {
+//    printf("DynamicAccessSmartContractMessage::getString\n");
 	string message = this->getRequestString();
 	message += " ";
 	message += to_string(this->client_startts);
 
+//	printf("getString Message: %s", message.c_str());
 	return message;
 }
 #endif
@@ -1708,6 +1739,7 @@ void BatchRequests::copy_to_buf(char *buf)
 
 string BatchRequests::getString(uint64_t sender)
 {
+    printf("---BatchRequests::getString\n");
 	string message = std::to_string(sender);
 	for (uint i = 0; i < get_batch_size(); i++)
 	{
@@ -1716,6 +1748,7 @@ string BatchRequests::getString(uint64_t sender)
 	}
 	message += hash;
 
+	printf("Message: %s\n", message.c_str());
 	return message;
 }
 

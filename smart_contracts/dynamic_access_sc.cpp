@@ -4,7 +4,7 @@
 #include "smart_contract.h"
 #include "smart_contract_txn.h"
 
-#if DYNAMIC_ACCESS_SMART_CONTRACT || true
+#if DYNAMIC_ACCESS_SMART_CONTRACT
 
 /*
  *   uint64_t source_id;
@@ -13,17 +13,6 @@
  */
 uint64_t NewCiphertextSmartContract::execute() {
     printf("Executing NewCiphertextSmartContact\n");
-
-    string temp = db->Get(std::to_string(this->source_id));
-    uint64_t source = temp.empty() ? 0 : stoi(temp);
-    temp = db->Get(std::to_string(this->dest_id));
-    uint64_t dest = temp.empty() ? 0 : stoi(temp);
-    if (amount <= source)
-    {
-        db->Put(std::to_string(this->source_id), std::to_string(source - amount));
-        db->Put(std::to_string(this->dest_id), std::to_string(dest + amount));
-        return 1;
-    }
     return 0;
 }
 
