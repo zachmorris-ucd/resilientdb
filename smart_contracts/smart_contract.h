@@ -26,7 +26,7 @@ class NewCiphertextSmartContract : public SmartContract
 class RetrieveCiphertextSmartContract : public SmartContract
 {
  public:
-  uint64_t source_id;
+//  uint64_t source_id;
   std::string alice_public_key;
   std::string your_public_key;
   uint64_t execute();

@@ -86,7 +86,7 @@ void WorkerThread::setup()
 
 void WorkerThread::process(Message *msg)
 {
-    std::cout << "Processing Message: " << msg->get_rtype() << std::endl;
+//    std::cout << "Processing Message: " << msg->get_rtype() << std::endl;
     RC rc __attribute__((unused));
 
     switch (msg->get_rtype())
@@ -675,7 +675,7 @@ RC WorkerThread::run()
             idle_starttime = 0;
         }
 
-        std::cout << "---Is incoming message: " << msg->rtype << std::endl;
+//        std::cout << "---Is incoming message: " << msg->rtype << std::endl;
 
 #if VIEW_CHANGES
         // Ensure that thread 0 of the primary never processes ClientQueryBatch.
@@ -819,7 +819,7 @@ void WorkerThread::init_txn_man(BankingSmartContractMessage *bsc){
  * @param clqry One Client Transaction (or Query).
 */
 void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
-    printf("--- INITIALIZING TRANSACTION MANAGER FORR THE WORKER THREAD\n");
+//    printf("--- INITIALIZING TRANSACTION MANAGER FORR THE WORKER THREAD\n");
     txn_man->client_id = dasc->return_node_id;
     txn_man->client_startts = dasc->client_startts;
     SmartContract *smart_contract;
@@ -834,6 +834,15 @@ void WorkerThread::init_txn_man(DynamicAccessSmartContractMessage *dasc){
             ncsc->type = DASC_UPLOAD_CIPHERTEXT;
 //            printf("---   inputs: %s, %s, %s", dasc->inputs[0].c_str(), dasc->inputs[1].c_str(), dasc->inputs[2].c_str());
             smart_contract = (SmartContract *) ncsc;
+            break;
+        }
+        case DASC_REQUEST_CIPHERTEXT: {
+            RetrieveCiphertextSmartContract *rcsc = new RetrieveCiphertextSmartContract();
+            rcsc->your_public_key = dasc->input_source;
+            rcsc->alice_public_key = dasc->requesting_public_key;
+            rcsc->type = DASC_REQUEST_CIPHERTEXT;
+
+            smart_contract = (SmartContract *) rcsc;
             break;
         }
         default:
@@ -1254,7 +1263,7 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
 
         init_txn_man(msg->cqrySet[i]);
 
-        cout << "Messages: " << msg->cqrySet[i]->input_source << ", "  << msg->cqrySet[i]->input_cipher_text << " " <<  msg->cqrySet[i]->input_capsule << endl;
+//        cout << "Messages: " << msg->cqrySet[i]->input_source << ", "  << msg->cqrySet[i]->input_cipher_text << " " <<  msg->cqrySet[i]->input_capsule << endl;
 
         // Append string representation of this txn.
         batchStr += msg->cqrySet[i]->getString();

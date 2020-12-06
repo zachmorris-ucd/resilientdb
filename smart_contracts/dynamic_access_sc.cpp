@@ -6,14 +6,18 @@
 
 #if DYNAMIC_ACCESS_SMART_CONTRACT
 
-/*
- *   uint64_t source_id;
-  std::string cipher_text_hex;
-  std::string capsule_hex;
- */
 uint64_t NewCiphertextSmartContract::execute() {
     printf("Executing NewCiphertextSmartContact\n");
-    return 0;
+
+    db->Put(public_key + "_ciphertext", cipher_text_hex);
+    db->Put(public_key + "_capsule", capsule_hex);
+
+    return 1;
+}
+
+uint64_t RetrieveCiphertextSmartContract::execute() {
+    printf("Executing RetrieveCiphertextSmartContract\n");
+    return 1;
 }
 
 /*
@@ -22,7 +26,7 @@ Smartt Contract Transaction Manager and Workload
 
 void SmartContractTxn::init(uint64_t thd_id, Workload *h_wl)
 {
-    printf("INITIALIZING DYNAMIC ACCESS SMART CONTRACT INIT\n");
+//    printf("INITIALIZING DYNAMIC ACCESS SMART CONTRACT INIT\n");
     TxnManager::init(thd_id, h_wl);
     _wl = (SCWorkload *)h_wl;
     reset();
@@ -41,7 +45,7 @@ RC SmartContractTxn::run_txn()
 
 RC SCWorkload::init()
 {
-    printf("INITIALIZING DYNAMIC ACCESS SMART CONTRACT WORKLOAD\n");
+//    printf("INITIALIZING DYNAMIC ACCESS SMART CONTRACT WORKLOAD\n");
     Workload::init();
     return RCOK;
 }
@@ -57,19 +61,23 @@ RC SCWorkload::get_txn_man(TxnManager *&txn_manager)
 
 uint64_t SmartContract::execute()
 {
-    printf("Executing dynamic access smart contract\n");
+//    printf("Executing dynamic access smart contract\n");
     int result = 0;
     switch (this->type)
     {
-    case DASC_UPLOAD_CIPHERTEXT:
-    {
-        printf("Type: DASC_NEWE\n");
-        NewCiphertextSmartContract *nc = (NewCiphertextSmartContract *)this;
+    case DASC_UPLOAD_CIPHERTEXT: {
+        NewCiphertextSmartContract *nc = (NewCiphertextSmartContract *) this;
         result = nc->execute();
         break;
     }
+    case DASC_REQUEST_CIPHERTEXT: {
+        RetrieveCiphertextSmartContract
+            *rc = (RetrieveCiphertextSmartContract *) this;
+        result = rc->execute();
+        break;
+    }
     default:
-        printf("ERROR: Couldn't find type\n");
+//        printf("ERROR: Couldn't find type\n");
         assert(0);
         break;
     }

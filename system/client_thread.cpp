@@ -194,13 +194,13 @@ RC ClientThread::run()
 
 #if DYNAMIC_ACCESS_SMART_CONTRACT
 //		printf("running smart contract\n");
+
+#if
         std::string source = "test source";
         std::string cipher_text = "test cipher text";
         std::string capsule = "test capsule";
         DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
         clqry->rtype = DASC_MSG;
-
-
         clqry->type = DASC_UPLOAD_CIPHERTEXT;
         clqry->input_capsule = capsule;
         clqry->input_cipher_text = cipher_text;

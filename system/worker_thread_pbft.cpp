@@ -39,11 +39,11 @@ RC WorkerThread::process_client_batch(Message *msg)
      * BSC_DEPOSIT = 1,
      * BSC_WITHDRAW = 2,
      */
-    printf("Contract: \n");
-    for(unsigned int i = 0; i < clbtch->cqrySet.size(); i++) {
-        printf("  message %d: %s\n", i, clbtch->cqrySet[i]->input_source.c_str());
-    }
-    fflush(stdout);
+//    printf("Contract: \n");
+//    for(unsigned int i = 0; i < clbtch->cqrySet.size(); i++) {
+//        printf("  message %d: %s\n", i, clbtch->cqrySet[i]->input_source.c_str());
+//    }
+//    fflush(stdout);
 
 //    printf("")
 

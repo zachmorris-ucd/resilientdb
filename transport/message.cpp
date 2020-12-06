@@ -612,8 +612,8 @@ void DynamicAccessSmartContractMessage::copy_to_txn(TxnManager *txn) {}
 
 void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 {
-    printf("DynamicAccessSmartContractMessage::copy_from_buf\n");
-    fflush(stdout);
+//    printf("DynamicAccessSmartContractMessage::copy_from_buf\n");
+//    fflush(stdout);
 
     uint64_t ptr = 0;
 
@@ -655,16 +655,16 @@ void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
 
 	COPY_VAL(type, buf, ptr);
 
-	printf("DONE copy_from_buf\n");
-	cout << "Ptr: " << ptr << ", get_size(): " << get_size() << endl;
-    fflush(stdout);
+//	printf("DONE copy_from_buf\n");
+//	cout << "Ptr: " << ptr << ", get_size(): " << get_size() << endl;
+//    fflush(stdout);
 	assert(ptr == get_size());
 }
 
 void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 {
-    printf("DynamicAccessSmartContractMessage::copy_to_buf\n");
-    fflush(stdout);
+//    printf("DynamicAccessSmartContractMessage::copy_to_buf\n");
+//    fflush(stdout);
 	uint64_t ptr = 0;
 
 	/*
@@ -727,9 +727,9 @@ void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
 
 	COPY_BUF(buf, type, ptr);
 
-	cout << "CREATED BUFFER" << std::endl;
-    cout << "Ptr: " << ptr << ", get_size(): " << get_size() << endl;
-    fflush(stdout);
+//	cout << "CREATED BUFFER" << std::endl;
+//    cout << "Ptr: " << ptr << ", get_size(): " << get_size() << endl;
+//    fflush(stdout);
     // get_size 66: ptr 86
 	assert(ptr == get_size());
 }
@@ -1744,7 +1744,7 @@ void BatchRequests::copy_to_buf(char *buf)
 
 string BatchRequests::getString(uint64_t sender)
 {
-    printf("---BatchRequests::getString\n");
+//    printf("---BatchRequests::getString\n");
 	string message = std::to_string(sender);
 	for (uint i = 0; i < get_batch_size(); i++)
 	{
@@ -1753,7 +1753,7 @@ string BatchRequests::getString(uint64_t sender)
 	}
 	message += hash;
 
-	printf("Message: %s\n", message.c_str());
+//	printf("Message: %s\n", message.c_str());
 	return message;
 }
 

@@ -201,9 +201,10 @@ class DynamicAccessSmartContractMessage : public ClientQueryMessage
   string getString();
   string getRequestString();
 
-  string input_source;
+  string input_source; // Public key of person uploading file / file to request
   string input_cipher_text;
   string input_capsule;
+  string requesting_public_key; // Public key of person requesting file
 
 //  vector<std::string>
 //  Array<std::string> inputs;
