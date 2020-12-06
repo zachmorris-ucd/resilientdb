@@ -590,10 +590,11 @@ uint64_t DynamicAccessSmartContractMessage::get_size()
 //    }
 
     // For the 3 size integers
-    size += 24;
+    size += 4 * sizeof(uint64_t);
     size += input_source.size();
     size += input_cipher_text.size();
     size += input_capsule.size();
+    size += requesting_public_key.size();
 
 	size += sizeof(DASCType);
 
@@ -652,6 +653,9 @@ void DynamicAccessSmartContractMessage::copy_from_buf(char *buf)
     COPY_VAL(input_size, buf, ptr);
     ptr = buf_to_string(buf, ptr, input_capsule, input_size);
 
+    COPY_VAL(input_size, buf, ptr);
+    ptr = buf_to_string(buf, ptr, requesting_public_key, input_size);
+
 
 	COPY_VAL(type, buf, ptr);
 
@@ -699,6 +703,14 @@ void DynamicAccessSmartContractMessage::copy_to_buf(char *buf)
     for (uint64_t i = 0; i < input_size; i++)
     {
         v = input_capsule[i];
+        COPY_BUF(buf, v, ptr);
+    }
+
+    input_size = requesting_public_key.size();
+    COPY_BUF(buf, input_size, ptr);
+    for (uint64_t i = 0; i < input_size; i++)
+    {
+        v = requesting_public_key[i];
         COPY_BUF(buf, v, ptr);
     }
 
