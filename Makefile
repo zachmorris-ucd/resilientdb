@@ -6,13 +6,16 @@ BOOST=deps/boost_1_67_0
 CRYPTOPP=deps/crypto
 SQLITE=deps/sqlite-autoconf-3290000/build
 
+PY_CFLAGS  := $(shell python3-config --cflags)
+PY_LDFLAGS := $(shell python3-config --ldflags)
+
 .SUFFIXES: .o .cpp .h
 
 SRC_DIRS = ./ ./benchmarks/ ./client/ ./transport/ ./system/ ./statistics/ ./blockchain/ ./db/ ./smart_contracts/
 DEPS = -I. -I./benchmarks -I./client/ -I./transport -I./system -I./statistics -I./blockchain -I./smart_contracts -I$(JEMALLOC)/include -I$(NNMSG)/include -I$(BOOST) -I$(CRYPTOPP) -I./db -I$(SQLITE)/include
 
-CFLAGS += $(DEPS) -D NOGRAPHITE=1 -Werror -Wno-sizeof-pointer-memaccess
-LDFLAGS = -Wall -L. -L$(NNMSG)/lib -L$(JEMALLOC)/lib -Wl,-rpath,$(JEMALLOC)/lib -pthread -gdwarf-3 -lrt -std=c++0x -L$(CRYPTOPP) -L$(SQLITE)/lib
+CFLAGS += ${PT_CFLAGS} $(DEPS) -D NOGRAPHITE=1 -Werror -Wno-sizeof-pointer-memaccess
+LDFLAGS = -Wall -L. -L$(NNMSG)/lib -L$(JEMALLOC)/lib -Wl,-rpath,$(JEMALLOC)/lib -pthread -gdwarf-3 -lrt -std=c++0x -L$(CRYPTOPP) -L$(SQLITE)/lib ${PY_LDFLAGS}
 LDFLAGS += $(CFLAGS)
 LIBS = -lnanomsg -lanl -ljemalloc -lcryptopp -lsqlite3 -ldl
 
