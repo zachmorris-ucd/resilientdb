@@ -195,30 +195,30 @@ RC ClientThread::run()
 #if DYNAMIC_ACCESS_SMART_CONTRACT
 //		printf("running smart contract\n");
 
-#if DYNAMIC_ACCESS_ENABLED_NEW
-        std::string source = "test source";
-        std::string cipher_text = "test cipher text";
-        std::string capsule = "test capsule";
-        DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
+#if DYNAMIC_ACCESS_ENABLED_NEW && DYNAMIC_ACCESS_ENABLED_RETRIEVE
+        DynamicAccessSmartContractMessage
+            *clqry = new DynamicAccessSmartContractMessage();
         clqry->rtype = DASC_MSG;
-        clqry->type = DASC_UPLOAD_CIPHERTEXT;
-        clqry->input_capsule = capsule;
-        clqry->input_cipher_text = cipher_text;
-        clqry->input_source = source;
-        ((ClientQueryMessage *)clqry)->client_startts = get_sys_clock();
+        ((ClientQueryMessage *) clqry)->client_startts = get_sys_clock();
         clqry->return_node_id = g_node_id;
-#endif
 
-#if DYNAMIC_ACCESS_ENABLED_RETRIEVE
-        std::string my_public_key = "test public key";
-        std::string alice_public_key = "test alice key";
-        DynamicAccessSmartContractMessage *clqry = new DynamicAccessSmartContractMessage();
-        clqry->rtype = DASC_MSG;
-        clqry->type = DASC_REQUEST_CIPHERTEXT;
-        clqry->input_source = my_public_key;
-        clqry->requesting_public_key = alice_public_key;
-        ((ClientQueryMessage *)clqry)->client_startts = get_sys_clock();
-        clqry->return_node_id = g_node_id;
+        if(addMore % 2 == 0) {
+            std::string source = "test source";
+            std::string cipher_text = "test cipher text";
+            std::string capsule = "test capsule";
+
+            clqry->type = DASC_UPLOAD_CIPHERTEXT;
+            clqry->input_capsule = capsule;
+            clqry->input_cipher_text = cipher_text;
+            clqry->input_source = source;
+        } else {
+            std::string my_public_key = "test public key";
+            std::string alice_public_key = "test alice key";
+
+            clqry->type = DASC_REQUEST_CIPHERTEXT;
+            clqry->input_source = my_public_key;
+            clqry->requesting_public_key = alice_public_key;
+        }
 #endif
 
 #endif

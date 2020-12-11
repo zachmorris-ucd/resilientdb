@@ -6,8 +6,8 @@ BOOST=deps/boost_1_67_0
 CRYPTOPP=deps/crypto
 SQLITE=deps/sqlite-autoconf-3290000/build
 
-PY_CFLAGS  := $(shell python3-config --cflags)
-PY_LDFLAGS := $(shell python3-config --ldflags)
+# PY_CFLAGS  := $(shell python3-config --cflags)
+# PY_LDFLAGS := $(shell python3-config --ldflags)
 
 .SUFFIXES: .o .cpp .h
 

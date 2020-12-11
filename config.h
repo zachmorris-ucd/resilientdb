@@ -219,9 +219,7 @@
 
 #define BANKING_SMART_CONTRACT false
 #define DYNAMIC_ACCESS_SMART_CONTRACT true
-// Enables the sending of NewCiphertextSmartContract
-#define DYNAMIC_ACCESS_ENABLED_NEW false
-// Enables the sending of RetrieveCiphertextSmartContract
+#define DYNAMIC_ACCESS_ENABLED_NEW true
 #define DYNAMIC_ACCESS_ENABLED_RETRIEVE true
 
 #endif
