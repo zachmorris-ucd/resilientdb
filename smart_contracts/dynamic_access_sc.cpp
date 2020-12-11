@@ -10,7 +10,7 @@ string NewCiphertextSmartContract::execute() {
     db->Put(public_key + "_ciphertext", cipher_text_hex);
     db->Put(public_key + "_capsule", capsule_hex);
 
-    cout << "Executing NewCiphertextSmartContact ciphertext: " << cipher_text_hex;
+    cout << "Executing NewCiphertextSmartContact ciphertext: " << cipher_text_hex << endl;
 
     return "successful upload for " + public_key;
 }

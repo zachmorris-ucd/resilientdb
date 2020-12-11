@@ -11,6 +11,7 @@
 #include "wl.h"
 #include "message.h"
 #include "timer.h"
+#include "ctime"
 
 void ClientThread::send_key()
 {
@@ -77,15 +78,16 @@ void ClientThread::setup()
 	}
 }
 
-string gen_random(const int len) {
+string gen_random(const int len, int addmore) {
 
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     string tmp_s;
     static const char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
 
-    srand( (unsigned) time(NULL) * getpid());
+    srand( seed + addmore);
 
     tmp_s.reserve(len);
 
@@ -226,7 +228,7 @@ RC ClientThread::run()
 
         if(addMore % 2 == 0) {
             std::string source = "publickey";
-            std::string cipher_text = gen_random(16);
+            std::string cipher_text = gen_random(16, addMore);
             std::string capsule = "capsule";
 
             clqry->type = DASC_UPLOAD_CIPHERTEXT;
