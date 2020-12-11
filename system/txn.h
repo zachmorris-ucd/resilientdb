@@ -118,6 +118,7 @@ public:
     Transaction *txn;
 #if BANKING_SMART_CONTRACT || DYNAMIC_ACCESS_SMART_CONTRACT
     SmartContract *smart_contract;
+    string result_message;
 #else
     BaseQuery *query; // Client query.
 #endif

@@ -9,7 +9,7 @@
 class SmartContract
 {
 public:
-  uint64_t execute();
+  string execute();
   DASCType type;
 };
 
@@ -20,7 +20,7 @@ class NewCiphertextSmartContract : public SmartContract
   std::string public_key;
   std::string cipher_text_hex;
   std::string capsule_hex;
-  uint64_t execute();
+  string execute();
 };
 
 class RetrieveCiphertextSmartContract : public SmartContract
@@ -29,7 +29,7 @@ class RetrieveCiphertextSmartContract : public SmartContract
 //  uint64_t source_id;
   std::string alice_public_key;
   std::string your_public_key;
-  uint64_t execute();
+  string execute();
 };
 
 

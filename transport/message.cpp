@@ -352,6 +352,7 @@ void Message::release_message(Message *msg)
 	{
 		ClientResponseMessage *m_msg = (ClientResponseMessage *)msg;
 		m_msg->release();
+		printf("CL_RSP HERE\n");
 		delete m_msg;
 		break;
 	}
@@ -1053,21 +1054,6 @@ void ClientQueryMessage::copy_to_buf(char *buf)
 
 /************************/
 
-uint64_t ClientResponseMessage::get_size()
-{
-	uint64_t size = Message::mget_size();
-	size += sizeof(uint64_t);
-
-#if CLIENT_RESPONSE_BATCH == true
-	size += sizeof(uint64_t) * index.size();
-	size += sizeof(uint64_t) * client_ts.size();
-#else
-	size += sizeof(uint64_t);
-#endif
-
-	return size;
-}
-
 void ClientResponseMessage::init()
 {
 	this->index.init(get_batch_size());
@@ -1088,6 +1074,14 @@ void ClientResponseMessage::copy_from_txn(TxnManager *txn)
 
 	view = get_current_view(txn->get_thd_id());
 
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+	if(txn->result_message != "") {
+        this->responses.push_back(txn->result_message);
+	} else {
+        this->responses.push_back("no_response");
+	}
+#endif
+
 #if CLIENT_RESPONSE_BATCH
 	this->index.add(txn->get_txn_id());
 	this->client_ts.add(txn->client_startts);
@@ -1103,6 +1097,29 @@ void ClientResponseMessage::copy_to_txn(TxnManager *txn)
 #if !CLIENT_RESPONSE_BATCH
 	txn->client_startts = client_startts;
 #endif
+}
+
+uint64_t ClientResponseMessage::get_size()
+{
+    uint64_t size = Message::mget_size();
+    size += sizeof(uint64_t);
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+    size += sizeof(uint64_t) * responses.size();
+    for(unsigned int i = 0; i < responses.size(); i++) {
+        string response = responses[i];
+        size += response.size();
+    }
+#endif
+
+#if CLIENT_RESPONSE_BATCH == true
+    size += sizeof(uint64_t) * index.size();
+    size += sizeof(uint64_t) * client_ts.size();
+#else
+    size += sizeof(uint64_t);
+#endif
+
+    return size;
 }
 
 void ClientResponseMessage::copy_from_buf(char *buf)
@@ -1127,6 +1144,20 @@ void ClientResponseMessage::copy_from_buf(char *buf)
 	}
 #else
 	COPY_VAL(client_startts, buf, ptr);
+#endif
+
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+    uint64_t input_size;
+
+    // 234 234 234 sk 234 1 2 3 4 5 6 123 2354 4356 345 1232 12 32 534 2 34534 3 abc 5 abcde
+
+    for(unsigned int i = 0; i < get_batch_size(); i++) {
+        string val;
+        COPY_VAL(input_size, buf, ptr);
+        ptr = buf_to_string(buf, ptr, val, input_size);
+
+        responses.push_back(val);
+    }
 #endif
 
 	COPY_VAL(view, buf, ptr);
@@ -1156,8 +1187,29 @@ void ClientResponseMessage::copy_to_buf(char *buf)
 	COPY_BUF(buf, client_startts, ptr);
 #endif
 
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+
+    // 234 234 234 sk 234 1 2 3 4 5 6 123 2354 4356 345 1232 12 32 534 2 34534 3 abc 5 abcde
+    string response;
+    uint64_t input_size;
+    char v;
+
+    for(unsigned int i = 0; i < responses.size(); i++) {
+        response = responses[i];
+        input_size = response.size();
+        COPY_BUF(buf, input_size, ptr);
+        for (uint64_t j = 0; j < input_size; j++)
+        {
+            v = response[j];
+            COPY_BUF(buf, v, ptr);
+        }
+
+    }
+#endif
+
 	COPY_BUF(buf, view, ptr);
 
+    cout << "Ptr: " << ptr << ", size:" << get_size() << endl;
 	assert(ptr == get_size());
 }
 

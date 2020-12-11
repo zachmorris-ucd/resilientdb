@@ -248,6 +248,10 @@ public:
 
     RC rc;
 
+#if CLIENT_RESPONSE_BATCH && DYNAMIC_ACCESS_SMART_CONTRACT
+    vector<string> responses;
+#endif
+
 #if CLIENT_RESPONSE_BATCH == true
     Array<uint64_t> index;
     Array<uint64_t> client_ts;

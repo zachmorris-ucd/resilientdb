@@ -6,18 +6,22 @@
 
 #if DYNAMIC_ACCESS_SMART_CONTRACT
 
-uint64_t NewCiphertextSmartContract::execute() {
-    printf("Executing NewCiphertextSmartContact\n");
-
+string NewCiphertextSmartContract::execute() {
     db->Put(public_key + "_ciphertext", cipher_text_hex);
     db->Put(public_key + "_capsule", capsule_hex);
 
-    return 1;
+    cout << "Executing NewCiphertextSmartContact ciphertext: " << cipher_text_hex;
+
+    return "successful upload for " + public_key;
 }
 
-uint64_t RetrieveCiphertextSmartContract::execute() {
-    printf("Executing RetrieveCiphertextSmartContract\n");
-    return 1;
+string RetrieveCiphertextSmartContract::execute() {
+    string ciphertext = db->Get(alice_public_key + "_ciphertext");
+    string capsule = db->Get(alice_public_key + "_capsule");
+
+    cout << "Executing RetrieveCiphertextSmartContract ciphertext: " << ciphertext << endl;
+
+    return "capsule: " + capsule + ", ciphertext: " + ciphertext;
 }
 
 /*
@@ -39,8 +43,13 @@ void SmartContractTxn::reset()
 
 RC SmartContractTxn::run_txn()
 {
+#if DYNAMIC_ACCESS_SMART_CONTRACT
+    this->result_message = this->smart_contract->execute();
+    return RCOK;
+#else
     this->smart_contract->execute();
     return RCOK;
+#endif
 };
 
 RC SCWorkload::init()
@@ -59,10 +68,10 @@ RC SCWorkload::get_txn_man(TxnManager *&txn_manager)
     return RCOK;
 }
 
-uint64_t SmartContract::execute()
+string SmartContract::execute()
 {
 //    printf("Executing dynamic access smart contract\n");
-    int result = 0;
+    string result;
     switch (this->type)
     {
     case DASC_UPLOAD_CIPHERTEXT: {
@@ -82,10 +91,10 @@ uint64_t SmartContract::execute()
         break;
     }
 
-    if (result)
-        return RCOK;
+    if (result != "fail")
+        return result;
     else
-        return NONE;
+        return "fail";
 }
 
 #endif

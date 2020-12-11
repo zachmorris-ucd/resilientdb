@@ -213,6 +213,10 @@ RC InputThread::client_recv_loop()
                 assert(0);
             }
             ClientResponseMessage *clrsp = (ClientResponseMessage *)msg;
+            cout << "CLRSP: " << clrsp->responses.size() << endl;
+            for(unsigned int j = 0; j < clrsp->responses.size(); j++) {
+                cout << "  " << j << ": " << clrsp->responses[j] << endl;
+            }
             // Check if the response is valid.
             if (clrsp->validate())
             {

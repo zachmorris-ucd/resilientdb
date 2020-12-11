@@ -77,6 +77,26 @@ void ClientThread::setup()
 	}
 }
 
+string gen_random(const int len) {
+
+    string tmp_s;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    srand( (unsigned) time(NULL) * getpid());
+
+    tmp_s.reserve(len);
+
+    for (int i = 0; i < len; ++i)
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+
+
+    return tmp_s;
+
+}
+
 RC ClientThread::run()
 {
 
@@ -202,18 +222,20 @@ RC ClientThread::run()
         ((ClientQueryMessage *) clqry)->client_startts = get_sys_clock();
         clqry->return_node_id = g_node_id;
 
+        srand(time(NULL));
+
         if(addMore % 2 == 0) {
-            std::string source = "test source";
-            std::string cipher_text = "test cipher text";
-            std::string capsule = "test capsule";
+            std::string source = "publickey";
+            std::string cipher_text = gen_random(16);
+            std::string capsule = "capsule";
 
             clqry->type = DASC_UPLOAD_CIPHERTEXT;
             clqry->input_capsule = capsule;
             clqry->input_cipher_text = cipher_text;
             clqry->input_source = source;
         } else {
-            std::string my_public_key = "test public key";
-            std::string alice_public_key = "test alice key";
+            std::string my_public_key = "bob_publickey";
+            std::string alice_public_key = "publickey";
 
             clqry->type = DASC_REQUEST_CIPHERTEXT;
             clqry->input_source = my_public_key;
